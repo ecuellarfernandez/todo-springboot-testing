@@ -1,34 +1,28 @@
 package com.todoapp.user.adapter.in;
 
-import com.todoapp.user.dto.UserRegisterRequest;
-import com.todoapp.user.dto.UserRegisterResponse;
-import com.todoapp.user.domain.User;
+import com.todoapp.user.dto.UserRequestDTO;
+import com.todoapp.user.dto.UserResponseDTO;
 import com.todoapp.user.port.in.UserUseCase;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 public class UserController {
+    private final UserUseCase useCase;
 
-    private final UserUseCase userUseCase;
-
-    public UserController(UserUseCase userUseCase) {
-        this.userUseCase = userUseCase;
+    public UserController(UserUseCase useCase) {
+        this.useCase = useCase;
     }
 
-    @PostMapping("/register")
-    public UserRegisterResponse register(@RequestBody @Valid UserRegisterRequest request) {
-        User user = new User();
-        user.setUsername(request.username());
-        user.setEmail(request.email());
-        user.setPasswordHash(request.password());
-        user.setCreatedAt(LocalDateTime.now());
+    @PostMapping
+    public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody UserRequestDTO dto) {
+        return ResponseEntity.ok(useCase.register(dto));
+    }
 
-        String token = userUseCase.registerUser(user);
-
-        return new UserRegisterResponse(token);
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> get(@PathVariable Long id) {
+        return ResponseEntity.ok(useCase.getById(id));
     }
 }
