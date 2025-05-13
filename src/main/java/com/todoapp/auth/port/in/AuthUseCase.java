@@ -1,4 +1,8 @@
 package com.todoapp.auth.port.in;
 
-public class AuthUseCase {
+import com.todoapp.auth.dto.LoginRequestDTO;
+import com.todoapp.auth.dto.AuthResponseDTO;
+
+public interface AuthUseCase {
+    AuthResponseDTO login(LoginRequestDTO dto);
 }
