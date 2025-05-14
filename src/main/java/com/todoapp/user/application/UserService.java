@@ -21,7 +21,7 @@ public class UserService implements UserUseCase {
     @Override
     public UserResponseDTO register(UserRequestDTO dto) {
         if (repo.existsByEmail(dto.email()) || repo.existsByUsername(dto.username())) {
-            throw new IllegalArgumentException("El usuario ya existe");
+            throw new UserAlreadyExistsException("El usuario ya existe");
         }
         String hashedPassword = passwordEncoder.encode(dto.password());
         User user = new User(null, dto.username(), dto.name(), dto.email(), hashedPassword);

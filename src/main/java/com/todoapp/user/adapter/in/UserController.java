@@ -16,7 +16,7 @@ public class UserController {
         this.useCase = useCase;
     }
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody UserRequestDTO dto) {
         return ResponseEntity.ok(useCase.register(dto));
     }
