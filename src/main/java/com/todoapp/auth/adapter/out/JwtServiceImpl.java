@@ -39,4 +39,9 @@ public class JwtServiceImpl implements JwtService {
     public String extractUsername(String token) {
         return Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody().getSubject();
     }
+
+    @Override
+    public String extractEmail(String token) {
+        return Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody().get("email", String.class);
+    }
 }

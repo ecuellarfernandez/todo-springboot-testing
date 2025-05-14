@@ -32,4 +32,10 @@ public class AuthService implements AuthUseCase {
         String token = jwtService.generateToken(user);
         return new AuthResponseDTO(token);
     }
+
+    @Override
+    public User getCurrentUser(String token) {
+        String email = jwtService.extractEmail(token);
+        return credentials.findByEmail(email);
+    }
 }
