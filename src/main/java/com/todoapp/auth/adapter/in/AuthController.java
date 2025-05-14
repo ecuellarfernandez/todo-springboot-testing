@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @Validated
 public class AuthController {
 

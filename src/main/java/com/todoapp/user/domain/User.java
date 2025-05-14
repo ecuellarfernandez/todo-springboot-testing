@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 public class User {
     private Long id;
     private String username;
+    private String name;
     private String email;
     private String password;
 
@@ -14,9 +15,10 @@ public class User {
     password TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP*/
 
-    public User(Long id, String username, String email, String password) {
+    public User(Long id, String username, String name, String email, String password) {
         this.id = id;
         this.username = username;
+        this.name = name;
         this.email = email;
         this.password = password;
     }
@@ -53,4 +55,11 @@ public class User {
         this.password = password;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

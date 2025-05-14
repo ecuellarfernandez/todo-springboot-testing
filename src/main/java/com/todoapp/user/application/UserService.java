@@ -24,7 +24,7 @@ public class UserService implements UserUseCase {
             throw new IllegalArgumentException("El usuario ya existe");
         }
         String hashedPassword = passwordEncoder.encode(dto.password());
-        User user = new User(null, dto.username(), dto.email(), hashedPassword);
+        User user = new User(null, dto.username(), dto.name(), dto.email(), hashedPassword);
         User saved = repo.save(user);
         return new UserResponseDTO(saved.getId(), saved.getUsername(), saved.getEmail());
     }

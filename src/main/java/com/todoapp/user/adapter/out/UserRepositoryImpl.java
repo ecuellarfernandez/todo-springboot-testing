@@ -16,17 +16,18 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User save(User user) {
         UserEntity entity = new UserEntity();
+        entity.name = user.getName();
         entity.username = user.getUsername();
         entity.email = user.getEmail();
         entity.password = user.getPassword();
         entity = jpa.save(entity);
-        return new User(entity.id, entity.username, entity.email, entity.password);
+        return new User(entity.id, entity.name, entity.username, entity.email, entity.password);
     }
 
     @Override
     public User findById(Long id) {
         UserEntity entity = jpa.findById(id).orElseThrow();
-        return new User(entity.id, entity.username, entity.email, entity.password);
+        return new User(entity.id, entity.name, entity.username, entity.email, entity.password);
     }
 
     @Override
