@@ -1,7 +1,9 @@
 package com.todoapp.user.port.in;
 
-import com.todoapp.user.domain.User;
+import com.todoapp.user.dto.UserRequestDTO;
+import com.todoapp.user.dto.UserResponseDTO;
 
 public interface UserUseCase {
-    String registerUser(User user);
+    UserResponseDTO register(UserRequestDTO dto);
+    UserResponseDTO getById(Long id);
 }
