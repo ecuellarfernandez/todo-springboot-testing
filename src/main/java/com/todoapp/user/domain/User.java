@@ -1,9 +1,9 @@
 package com.todoapp.user.domain;
 
 public class User {
-    private Long id;
+    private final Long id;
     private String username;
-    private String name;
+    private final String name;
     private String email;
     private String password;
 
