@@ -1,5 +1,4 @@
 package com.todoapp.user.application;
-
 import com.todoapp.user.port.in.UserUseCase;
 import com.todoapp.user.port.out.UserRepository;
 import com.todoapp.user.domain.User;
@@ -7,6 +6,7 @@ import com.todoapp.user.dto.UserRequestDTO;
 import com.todoapp.user.dto.UserResponseDTO;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService implements UserUseCase {
@@ -19,6 +19,7 @@ public class UserService implements UserUseCase {
     }
 
     @Override
+    @Transactional
     public UserResponseDTO register(UserRequestDTO dto) {
         if (repo.existsByEmail(dto.email()) || repo.existsByUsername(dto.username())) {
             throw new UserAlreadyExistsException("El usuario ya existe");
@@ -30,6 +31,7 @@ public class UserService implements UserUseCase {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserResponseDTO getById(Long id) {
         User user = repo.findById(id);
         return new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail());
