@@ -10,8 +10,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
-
     // El orden de los parámetros en User es: id, username, name, email, password
     @Mapping(target = "id", source = "id")
     @Mapping(target = "username", source = "username")
