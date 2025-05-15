@@ -18,6 +18,6 @@ public class UserCredentialsAdapter implements UserCredentialsPort {
     @Override
     public User findByEmail(String email) {
         UserEntity entity = jpa.findByEmail(email).orElseThrow();
-        return new User(entity.id, entity.username, entity.name, entity.email, entity.password);
+        return new User(entity.getId(), entity.getUsername(), entity.getName(), entity.getEmail(), entity.getPassword());
     }
 }

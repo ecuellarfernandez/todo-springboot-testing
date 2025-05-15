@@ -47,8 +47,8 @@ public class JwtFilter extends OncePerRequestFilter {
             UserEntity userEntity = userRepo.findByEmail(username).orElse(null);
             if (userEntity != null && jwtService.isValid(jwt)) {
                 User userDetails = new User(
-                        userEntity.email,
-                        userEntity.password,
+                        userEntity.getEmail(),
+                        userEntity.getPassword(),
                         Collections.emptyList()
                 );
 
