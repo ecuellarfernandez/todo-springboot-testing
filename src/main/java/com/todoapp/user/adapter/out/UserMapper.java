@@ -3,7 +3,6 @@ package com.todoapp.user.adapter.out;
 import com.todoapp.user.domain.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
