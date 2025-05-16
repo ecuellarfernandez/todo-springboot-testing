@@ -1,4 +1,5 @@
 package com.todoapp.user.application;
+import com.todoapp.user.application.exception.UserAlreadyExistsException;
 import com.todoapp.user.port.in.UserUseCase;
 import com.todoapp.user.port.out.UserRepository;
 import com.todoapp.user.domain.User;
