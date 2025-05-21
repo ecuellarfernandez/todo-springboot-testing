@@ -1,6 +1,7 @@
 package com.todoapp.common.exception;
 
 import com.todoapp.user.application.exception.UserAlreadyExistsException;
+import com.todoapp.user.application.exception.UserAlreadyLoggedInException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.View;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,17 +18,34 @@ import java.util.NoSuchElementException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private final View error;
+
+    public GlobalExceptionHandler(View error) {
+        this.error = error;
+    }
+
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(
             UserAlreadyExistsException ex, WebRequest request) {
 
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.CONFLICT.value(),
-                "Conflicto",
+                "El usuario ya existe",
                 ex.getMessage(),
                 request.getDescription(false)
         );
 
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(UserAlreadyLoggedInException.class)
+    public ResponseEntity<ErrorResponse> handleUserAlreadyLoggedInException(UserAlreadyLoggedInException ex, WebRequest request){
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                "El usuario ya está logueado",
+                ex.getMessage(),
+                request.getDescription(false)
+        );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
