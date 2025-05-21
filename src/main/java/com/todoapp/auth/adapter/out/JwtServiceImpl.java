@@ -1,64 +1,54 @@
 package com.todoapp.auth.adapter.out;
 
-import com.todoapp.user.domain.User;
 import com.todoapp.auth.port.out.JwtService;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
+import com.todoapp.user.domain.User;
+import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Service
 public class JwtServiceImpl implements JwtService {
 
-    private static final String SECRET = "secreto_seguro_para_el_todo_list";
-    private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+    private final JwtEncoder encoder;
+    private final JwtDecoder decoder;
+
+    public JwtServiceImpl(JwtEncoder encoder, JwtDecoder decoder) {
+        this.encoder = encoder;
+        this.decoder = decoder;
+    }
 
     @Override
     public String generateToken(User user) {
-        return Jwts.builder()
-                .setSubject(user.getEmail())
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .subject(user.getEmail())
                 .claim("username", user.getUsername())
+                .claim("email", user.getEmail())
                 .claim("userId", user.getId())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-                .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
-                .compact();
+                .issuedAt(Instant.now())
+                .expiresAt(Instant.now().plus(10, ChronoUnit.HOURS))
+                .build();
+        return encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
     @Override
     public boolean isValid(String token) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(SECRET_KEY)
-                    .build()
-                    .parseClaimsJws(token);
+            decoder.decode(token);
             return true;
-        } catch (Exception e) {
+        } catch (JwtException e) {
             return false;
         }
     }
 
     @Override
     public String extractUsername(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        return decoder.decode(token).getSubject();
     }
 
     @Override
     public String extractEmail(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .get("email", String.class);
+        return decoder.decode(token).getClaim("email");
     }
 }
