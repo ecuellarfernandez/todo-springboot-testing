@@ -43,6 +43,15 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
+    public boolean isTokenValid(String token, User user) {
+        final String username = extractUsername(token);
+        final String email = extractEmail(token);
+
+        return (username.equals(user.getUsername()) ||
+               email.equals(user.getEmail())) && isValid(token);
+    }
+
+    @Override
     public String extractUsername(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(SECRET_KEY)
