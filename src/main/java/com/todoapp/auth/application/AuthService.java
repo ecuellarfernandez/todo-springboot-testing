@@ -5,16 +5,12 @@ import com.todoapp.auth.dto.AuthResponseDTO;
 import com.todoapp.auth.port.in.AuthUseCase;
 import com.todoapp.auth.port.out.JwtService;
 import com.todoapp.auth.port.out.UserCredentialsPort;
-import com.todoapp.user.application.exception.UserAlreadyLoggedInException;
 import com.todoapp.user.domain.User;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class AuthService implements AuthUseCase {
 
