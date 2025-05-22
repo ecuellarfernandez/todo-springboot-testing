@@ -39,7 +39,7 @@ public class AuthService implements AuthUseCase {
 
     @Override
     public User getCurrentUser(String token) {
-        String email = jwtService.extractEmail(token);
+        String email = jwtService.extractUsername(token);
         return credentials.findByEmail(email);
     }
 }
