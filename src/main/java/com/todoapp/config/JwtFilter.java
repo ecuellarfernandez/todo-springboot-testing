@@ -1,6 +1,6 @@
 package com.todoapp.config;
 
-import com.todoapp.auth.port.out.JwtService;
+import com.todoapp.auth.port.out.JwtEncoder;
 import com.todoapp.user.adapter.out.UserJpaRepository;
 import com.todoapp.user.adapter.out.UserEntity;
 import jakarta.servlet.FilterChain;
@@ -20,11 +20,11 @@ import java.util.Collections;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final JwtEncoder jwtEncoder;
     private final UserJpaRepository userRepo;
 
-    public JwtFilter(JwtService jwtService, UserJpaRepository userRepo) {
-        this.jwtService = jwtService;
+    public JwtFilter(JwtEncoder jwtEncoder, UserJpaRepository userRepo) {
+        this.jwtEncoder = jwtEncoder;
         this.userRepo = userRepo;
     }
 
@@ -41,11 +41,11 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         String jwt = authHeader.substring(7);
-        String username = jwtService.extractUsername(jwt);
+        String username = jwtEncoder.extractUsername(jwt);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserEntity userEntity = userRepo.findByEmail(username).orElse(null);
-            if (userEntity != null && jwtService.isValid(jwt)) {
+            if (userEntity != null && jwtEncoder.validateToken(jwt)) {
                 User userDetails = new User(
                         userEntity.getEmail(),
                         userEntity.getPassword(),

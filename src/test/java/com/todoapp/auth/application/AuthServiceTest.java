@@ -2,7 +2,7 @@ package com.todoapp.auth.application;
 
 import com.todoapp.auth.dto.AuthResponseDTO;
 import com.todoapp.auth.dto.LoginRequestDTO;
-import com.todoapp.auth.port.out.JwtService;
+import com.todoapp.auth.port.out.JwtEncoder;
 import com.todoapp.auth.port.out.UserCredentialsPort;
 import com.todoapp.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +22,7 @@ class AuthServiceTest {
     UserCredentialsPort credentials;
 
     @Mock
-    JwtService jwtService;
+    JwtEncoder jwtEncoder;
 
     @Mock
     PasswordEncoder encoder;
@@ -31,7 +31,7 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new AuthService(credentials, jwtService, encoder);
+        service = new AuthService(credentials, jwtEncoder, encoder);
     }
 
     @Test
@@ -40,7 +40,7 @@ class AuthServiceTest {
         User user = new User(1L, "user", "name", "mail", "hashed");
         when(credentials.findByEmail("mail")).thenReturn(user);
         when(encoder.matches("pass", "hashed")).thenReturn(true);
-        when(jwtService.generateToken(user)).thenReturn("token");
+        when(jwtEncoder.generateToken(user)).thenReturn("token");
         AuthResponseDTO response = service.login(request);
         assertThat(response.token()).isEqualTo("token");
     }

@@ -4,6 +4,7 @@ import com.todoapp.user.application.exception.UserAlreadyExistsException;
 import com.todoapp.user.application.exception.UserAlreadyLoggedInException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -24,6 +25,20 @@ public class GlobalExceptionHandler {
         this.error = error;
     }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentialsException(
+            BadCredentialsException ex, WebRequest request) {
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                "Credenciales inválidas",
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+    }
+
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(
             UserAlreadyExistsException ex, WebRequest request) {
@@ -35,17 +50,6 @@ public class GlobalExceptionHandler {
                 request.getDescription(false)
         );
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
-    }
-
-    @ExceptionHandler(UserAlreadyLoggedInException.class)
-    public ResponseEntity<ErrorResponse> handleUserAlreadyLoggedInException(UserAlreadyLoggedInException ex, WebRequest request){
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.CONFLICT.value(),
-                "El usuario ya está logueado",
-                ex.getMessage(),
-                request.getDescription(false)
-        );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 

@@ -1,7 +1,7 @@
 package com.todoapp.auth.adapter.out;
 
+import com.todoapp.auth.port.out.JwtEncoder;
 import com.todoapp.user.domain.User;
-import com.todoapp.auth.port.out.JwtService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Service
-public class JwtServiceImpl implements JwtService {
+public class JwtEncoderImpl implements JwtEncoder {
 
     @Value("${JWT_SECRET}")
     private String secretKey;
@@ -32,7 +32,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public boolean isValid(String token) {
+    public boolean validateToken(String token) {
         SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         try {
             Jwts.parserBuilder()
@@ -54,16 +54,5 @@ public class JwtServiceImpl implements JwtService {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
-    }
-
-    @Override
-    public String extractEmail(String token) {
-        SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .get("email", String.class);
     }
 }
