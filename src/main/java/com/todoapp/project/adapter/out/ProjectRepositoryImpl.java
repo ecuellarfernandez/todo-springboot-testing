@@ -1,0 +1,59 @@
+package com.todoapp.project.adapter.out;
+
+import com.todoapp.project.application.mapper.ProjectMapper;
+import com.todoapp.project.domain.Project;
+import com.todoapp.project.port.out.ProjectRepository;
+import com.todoapp.user.adapter.out.UserEntity;
+import com.todoapp.user.adapter.out.UserMapper;
+import com.todoapp.user.port.out.UserRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.NoSuchElementException;
+
+@Repository
+public class ProjectRepositoryImpl implements ProjectRepository {
+
+    private final ProjectJpaRepository jpaRepository;
+    private final ProjectMapper mapper;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public ProjectRepositoryImpl(ProjectJpaRepository jpaRepository,
+                               ProjectMapper mapper) {
+        this.jpaRepository = jpaRepository;
+        this.mapper = mapper;
+    }
+
+    @Override
+    public Project save(Project project) {
+        ProjectEntity entity = mapper.domainToEntity(project);
+        entity.setOwner(entityManager.getReference(UserEntity.class, project.getUserId()));
+        ProjectEntity savedEntity = jpaRepository.save(entity);
+        return mapper.entityToDomain(savedEntity);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Project findById(UUID id) {
+        return jpaRepository.findById(id)
+                .map(mapper::entityToDomain)
+                .orElseThrow(() -> new NoSuchElementException("Proyecto no encontrado con id: " + id));
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<Project> findByUserId(UUID userId) {
+        return mapper.entitiesToDomains(jpaRepository.findByOwnerId(userId));
+    }
+
+    @Override
+    public void delete(UUID id) {
+        jpaRepository.deleteById(id);
+    }
+}
