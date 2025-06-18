@@ -1,5 +1,6 @@
 package com.todoapp.task.application;
 
+import com.todoapp.task.application.mapper.TaskMapper;
 import com.todoapp.task.domain.Task;
 import com.todoapp.task.dto.*;
 import com.todoapp.task.port.in.TaskUseCase;
@@ -15,9 +16,11 @@ import java.util.stream.Collectors;
 public class TaskService implements TaskUseCase {
 
     private final TaskRepository repo;
+    private final TaskMapper mapper;
 
-    public TaskService(TaskRepository repo) {
+    public TaskService(TaskRepository repo, TaskMapper mapper) {
         this.repo = repo;
+        this.mapper = mapper;
     }
 
     @Override
@@ -33,27 +36,31 @@ public class TaskService implements TaskUseCase {
         );
 
         Task saved = repo.save(task);
-        return mapToResponseDTO(saved);
+        return mapper.toResponseDTO(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
     public TaskResponseDTO getById(UUID id) {
         Task task = repo.findById(id);
-        return mapToResponseDTO(task);
+        return mapper.toResponseDTO(task);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<TaskResponseDTO> getByTodoList(UUID todoListId) {
         return repo.findByTodoListId(todoListId).stream()
-                .map(this::mapToResponseDTO)
+                .map(mapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public TaskResponseDTO update(UUID id, TaskUpdateDTO dto) {
+        if(!repo.existsById(id)){
+            throw new IllegalArgumentException("Task with ID " + id + " does not exist.");
+        }
+
         Task task = repo.findById(id);
 
         if (dto.title() != null) {
@@ -67,7 +74,7 @@ public class TaskService implements TaskUseCase {
         }
 
         Task updated = repo.save(task);
-        return mapToResponseDTO(updated);
+        return mapper.toResponseDTO(updated);
     }
 
     @Override
@@ -76,23 +83,12 @@ public class TaskService implements TaskUseCase {
         Task task = repo.findById(id);
         task.setCompleted(dto.completed());
         Task updated = repo.save(task);
-        return mapToResponseDTO(updated);
+        return mapper.toResponseDTO(updated);
     }
 
     @Override
     @Transactional
     public void delete(UUID id) {
         repo.delete(id);
-    }
-
-    private TaskResponseDTO mapToResponseDTO(Task task) {
-        return new TaskResponseDTO(
-                task.getId(),
-                task.getTitle(),
-                task.getDescription(),
-                task.isCompleted(),
-                task.getDueDate(),
-                task.getTodoListId()
-        );
     }
 }
