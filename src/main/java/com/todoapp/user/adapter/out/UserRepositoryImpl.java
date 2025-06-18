@@ -4,6 +4,8 @@ import com.todoapp.user.domain.User;
 import com.todoapp.user.port.out.UserRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class UserRepositoryImpl implements UserRepository {
 
@@ -23,7 +25,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User findById(Long id) {
+    public User findById(UUID id) {
         UserEntity entity = jpa.findById(id).orElseThrow();
         return mapper.entityToDomain(entity);
     }

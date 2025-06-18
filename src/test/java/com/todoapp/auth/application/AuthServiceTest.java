@@ -12,6 +12,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -37,20 +40,26 @@ class AuthServiceTest {
     @Test
     void shouldLoginWithValidCredentials() {
         LoginRequestDTO request = new LoginRequestDTO("mail", "pass");
-        User user = new User(1L, "user", "name", "mail", "hashed");
+        UUID id = UUID.randomUUID();
+        User user = new User(id, "user", "name", "mail", "hashed");
         when(credentials.findByEmail("mail")).thenReturn(user);
         when(encoder.matches("pass", "hashed")).thenReturn(true);
         when(jwtEncoder.generateToken(user)).thenReturn("token");
+
         AuthResponseDTO response = service.login(request);
+
         assertThat(response.token()).isEqualTo("token");
     }
 
     @Test
     void shouldThrowOnInvalidCredentials() {
         LoginRequestDTO request = new LoginRequestDTO("mail", "wrong");
-        User user = new User(1L, "user", "name", "mail", "hashed");
+        UUID id = UUID.randomUUID();
+        User user = new User(id, "user", "name", "mail", "hashed");
         when(credentials.findByEmail("mail")).thenReturn(user);
         when(encoder.matches("wrong", "hashed")).thenReturn(false);
-        assertThatThrownBy(() -> service.login(request)).isInstanceOf(BadCredentialsException.class);
+
+        assertThatThrownBy(() -> service.login(request))
+                .isInstanceOf(BadCredentialsException.class);
     }
 }
