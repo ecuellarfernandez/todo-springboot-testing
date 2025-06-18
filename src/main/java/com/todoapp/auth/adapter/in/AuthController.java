@@ -1,7 +1,8 @@
 package com.todoapp.auth.adapter.in;
 import com.todoapp.auth.dto.LoginRequestDTO;
 import com.todoapp.auth.dto.AuthResponseDTO;
-import com.todoapp.auth.port.in.AuthUseCase;
+import com.todoapp.auth.port.in.LoginUseCase;
+import com.todoapp.auth.port.in.UserContextUseCase;
 import com.todoapp.user.domain.User;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -13,21 +14,23 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class AuthController {
 
-    private final AuthUseCase authUseCase;
+    private final LoginUseCase loginUseCase;
+    private final UserContextUseCase userContextUseCase;
 
-    public AuthController(AuthUseCase authUseCase) {
-        this.authUseCase = authUseCase;
+    public AuthController(LoginUseCase loginUseCase, UserContextUseCase userContextUseCase) {
+        this.loginUseCase = loginUseCase;
+        this.userContextUseCase = userContextUseCase;
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO dto) {
-        return ResponseEntity.ok(authUseCase.login(dto));
+        return ResponseEntity.ok(loginUseCase.login(dto));
     }
 
     @GetMapping("/me")
     public ResponseEntity<User> me(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
-        User user = authUseCase.getCurrentUser(token);
+        User user = userContextUseCase.getCurrentUser(token);
         return ResponseEntity.ok(user);
     }
 }
