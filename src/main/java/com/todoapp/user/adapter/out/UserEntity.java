@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class UserEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
@@ -23,11 +23,9 @@ public class UserEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
-    // Constructor por defecto necesario para JPA
     public UserEntity() {
     }
 
-    // Constructor con todos los campos excepto ID (generado automáticamente)
     public UserEntity(String username, String name, String email, String password) {
         this.username = username;
         this.name = name;
@@ -35,7 +33,6 @@ public class UserEntity {
         this.password = password;
     }
 
-    // Getters y Setters
     public Long getId() {
         return id;
     }
