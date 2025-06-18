@@ -13,6 +13,7 @@ public record UserRequestDTO(
         @Size(min = 3, message = "El nombre debe tener al menos 3 caracteres")
 
         String name,
+        @NotBlank(message = "El correo electrónico es obligatorio")
         @Email(message = "El correo electrónico no es válido")
         String email,
 

@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -22,7 +24,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> get(@PathVariable Long id) {
+    public ResponseEntity<UserResponseDTO> get(@PathVariable UUID id) {
         return ResponseEntity.ok(useCase.getById(id));
     }
 }

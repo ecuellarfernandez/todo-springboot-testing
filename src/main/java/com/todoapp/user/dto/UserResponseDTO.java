@@ -1,3 +1,5 @@
 package com.todoapp.user.dto;
 
-public record UserResponseDTO(Long id, String username, String email) {}
+import java.util.UUID;
+
+public record UserResponseDTO(UUID id, String username, String email) {}

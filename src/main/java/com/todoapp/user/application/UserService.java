@@ -1,16 +1,20 @@
 package com.todoapp.user.application;
+
 import com.todoapp.user.application.exception.UserAlreadyExistsException;
-import com.todoapp.user.port.in.UserUseCase;
-import com.todoapp.user.port.out.UserRepository;
 import com.todoapp.user.domain.User;
 import com.todoapp.user.dto.UserRequestDTO;
 import com.todoapp.user.dto.UserResponseDTO;
+import com.todoapp.user.port.in.UserUseCase;
+import com.todoapp.user.port.out.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 public class UserService implements UserUseCase {
+
     private final UserRepository repo;
     private final PasswordEncoder passwordEncoder;
 
@@ -33,7 +37,7 @@ public class UserService implements UserUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public UserResponseDTO getById(Long id) {
+    public UserResponseDTO getById(UUID id) {
         User user = repo.findById(id);
         return new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail());
     }
