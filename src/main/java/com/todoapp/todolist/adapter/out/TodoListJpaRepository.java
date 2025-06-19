@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface TodoListJpaRepository extends JpaRepository<TodoListEntity, UUID> {
     List<TodoListEntity> findByProjectId(UUID projectId);
+    boolean existsByNameAndProjectId(String name, UUID projectId);
 }
