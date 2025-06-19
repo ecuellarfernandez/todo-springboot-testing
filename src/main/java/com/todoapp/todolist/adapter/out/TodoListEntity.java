@@ -23,5 +23,4 @@ public class TodoListEntity {
 
     @OneToMany(mappedBy = "todoList", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TaskEntity> tasks;
-
 }
