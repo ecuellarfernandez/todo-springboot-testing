@@ -49,11 +49,18 @@ public class ProjectRepositoryImpl implements ProjectRepository {
     @Transactional(readOnly = true)
     @Override
     public List<Project> findByUserId(UUID userId) {
-        return mapper.entitiesToDomains(jpaRepository.findByOwnerId(userId));
+        List<ProjectEntity> entities = jpaRepository.findByOwnerId(userId);
+        if (entities.isEmpty()) {
+            throw new NoSuchElementException("No se encontraron proyectos para el usuario con id: " + userId);
+        }
+        return mapper.entitiesToDomains(entities);
     }
 
     @Override
     public void delete(UUID id) {
+    if (!jpaRepository.existsById(id)) {
+            throw new NoSuchElementException("No se encontró el proyecto con id: " + id);
+    }
         jpaRepository.deleteById(id);
     }
 }
