@@ -4,8 +4,6 @@ import com.todoapp.project.application.mapper.ProjectMapper;
 import com.todoapp.project.domain.Project;
 import com.todoapp.project.port.out.ProjectRepository;
 import com.todoapp.user.adapter.out.UserEntity;
-import com.todoapp.user.adapter.out.UserMapper;
-import com.todoapp.user.port.out.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
@@ -62,5 +60,10 @@ public class ProjectRepositoryImpl implements ProjectRepository {
             throw new NoSuchElementException("No se encontró el proyecto con id: " + id);
     }
         jpaRepository.deleteById(id);
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return jpaRepository.existsById(id);
     }
 }
