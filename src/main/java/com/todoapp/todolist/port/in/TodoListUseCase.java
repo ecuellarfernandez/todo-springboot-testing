@@ -11,5 +11,7 @@ public interface TodoListUseCase {
     TodoListResponseDTO getById(UUID id);
     List<TodoListResponseDTO> getByUser();
     TodoListResponseDTO update(UUID id, TodoListRequestDTO dto);
-    void delete(UUID id);
+    void delete(UUID id, UUID projectId);
+    List<TodoListResponseDTO> getByProject(UUID projectId);
+    TodoListResponseDTO getByIdAndProject(UUID id, UUID projectId);
 }
