@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface TodoListUseCase {
     TodoListResponseDTO create(TodoListRequestDTO dto);
-    TodoListResponseDTO findById(UUID id);
+    TodoListResponseDTO getById(UUID id);
     List<TodoListResponseDTO> getByUser();
     TodoListResponseDTO update(UUID id, TodoListRequestDTO dto);
     void delete(UUID id);
