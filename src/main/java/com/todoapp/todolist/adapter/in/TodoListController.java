@@ -27,7 +27,7 @@ public class TodoListController {
 
     @GetMapping("/{id}")
     public ResponseEntity<TodoListResponseDTO> findById(@PathVariable UUID id) {
-        return ResponseEntity.ok(useCase.findById(id));
+        return ResponseEntity.ok(useCase.getById(id));
     }
 
     @GetMapping
