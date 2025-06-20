@@ -1,49 +1,66 @@
 package com.todoapp.task.adapter.out;
 
+import com.todoapp.project.adapter.out.ProjectEntity;
+import com.todoapp.task.application.mapper.TaskMapper;
 import com.todoapp.task.domain.Task;
 import com.todoapp.task.port.out.TaskRepository;
+import com.todoapp.todolist.adapter.out.TodoListEntity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
 public class TaskRepositoryImpl implements TaskRepository {
+    private final TaskJpaRepository jpa;
+    private final TaskMapper mapper;
+    @PersistenceContext
+    private final EntityManager entityManager;
 
-    private final Map<UUID, Task> tasks = new ConcurrentHashMap<>();
+    public TaskRepositoryImpl(TaskJpaRepository jpa, TaskMapper mapper, EntityManager entityManager) {
+        this.jpa = jpa;
+        this.mapper = mapper;
+        this.entityManager = entityManager;
+    }
 
     @Override
     public Task save(Task task) {
-        if (task.getId() == null) {
-            task.setId(UUID.randomUUID());
-        }
-        tasks.put(task.getId(), task);
-        return task;
+        TaskEntity entity = mapper.domainToEntity(task);
+        entity.setTodoList(entityManager.getReference(TodoListEntity.class, task.getTodoListId()));
+        TaskEntity savedEntity = jpa.save(entity);
+        return mapper.entityToDomain(savedEntity);
     }
 
     @Override
     public Task findById(UUID id) {
-        return tasks.get(id);
+        return jpa.findById(id)
+                .map(mapper::entityToDomain)
+                .orElseThrow(() -> new NoSuchElementException("Tarea no encontrada con id: " + id));
     }
 
     @Override
     public List<Task> findByTodoListId(UUID todoListId) {
-        return tasks.values().stream()
-                .filter(task -> task.getTodoListId().equals(todoListId))
-                .collect(Collectors.toList());
+        List<TaskEntity> entities = jpa.findByTodoListId(todoListId);
+        if (entities.isEmpty()) {
+            throw new NoSuchElementException("No se encontraron tareas para la lista de tareas con id: " + todoListId);
+        }
+        return mapper.entitiesToDomains(entities);
     }
 
     @Override
     public void delete(UUID id) {
-        tasks.remove(id);
+        if(!jpa.existsById(id)) {
+            throw new NoSuchElementException("No se encontró la tarea con id: " + id);
+        }
+        jpa.deleteById(id);
     }
 
     @Override
     public boolean existsById(UUID id) {
-        return tasks.containsKey(id);
+        return jpa.existsById(id);
     }
 }
