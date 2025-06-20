@@ -49,19 +49,28 @@ public class TodoListRepositoryImpl implements TodoListRepository {
         return mapper.entitiesToDomains(entities);
     }
 
+
     @Override
-    public void delete(UUID id) {
-        if (!jpa.existsById(id)) {
-            throw new NoSuchElementException("No se encontró la lista de tareas con id: " + id);
-        }
-        jpa.deleteById(id);
+    public void delete(UUID id, UUID projectId) {
+        TodoListEntity entity = jpa.findByIdAndProjectId(id, projectId)
+            .orElseThrow(() -> new NoSuchElementException("No se encontró la lista con id: " + id + " y projectId: " + projectId));
+        jpa.delete(entity);
     }
 
     @Override
-    public boolean existsByNameAndProjectId(String name, UUID projectId) {
-        if (name == null || projectId == null) {
-            throw new IllegalArgumentException("El nombre y el ID del proyecto no pueden ser nulos");
+    public List<TodoList> findByUserId(UUID userId) {
+        List<TodoListEntity> entities = jpa.findByProject_Owner_Id(userId);
+        if (entities.isEmpty()) {
+            throw new NoSuchElementException("No se encontraron listas de tareas para el usuario con id: " + userId);
         }
-        return jpa.existsByNameAndProjectId(name, projectId);
+        return mapper.entitiesToDomains(entities);
     }
+
+    @Override
+    public TodoList findByIdAndProjectId(UUID id, UUID projectId) {
+        return jpa.findByIdAndProjectId(id, projectId)
+                .map(mapper::entityToDomain)
+                .orElse(null);
+    }
+
 }

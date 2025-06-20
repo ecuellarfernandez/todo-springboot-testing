@@ -2,7 +2,6 @@ package com.todoapp.todolist.application;
 
 import com.todoapp.common.OwnershipValidator;
 import com.todoapp.common.UserProvider;
-import com.todoapp.project.domain.Project;
 import com.todoapp.project.port.out.ProjectRepository;
 import com.todoapp.todolist.domain.TodoList;
 import com.todoapp.todolist.domain.mapper.TodoListMapper;
@@ -24,12 +23,14 @@ public class TodoListService implements TodoListUseCase {
     private final TodoListMapper mapper;
     private final ProjectRepository projectRepository;
     private final OwnershipValidator ownershipValidator;
+    private final UserProvider userProvider;
 
-    public TodoListService(TodoListRepository repo, TodoListMapper mapper, ProjectRepository projectRepository, OwnershipValidator ownershipValidator) {
+    public TodoListService(TodoListRepository repo, TodoListMapper mapper, ProjectRepository projectRepository, OwnershipValidator ownershipValidator, UserProvider userProvider) {
         this.repo = repo;
         this.mapper = mapper;
         this.projectRepository = projectRepository;
         this.ownershipValidator = ownershipValidator;
+        this.userProvider = userProvider;
     }
 
     @Override
@@ -59,17 +60,58 @@ public class TodoListService implements TodoListUseCase {
 
     @Override
     public List<TodoListResponseDTO> getByUser() {
-        return List.of();
+        User currentUser = userProvider.getCurrentUser();
+        List<TodoList> todoLists = repo.findByUserId(currentUser.getId());
+        todoLists.forEach(this::validateOwnership);
+        return todoLists.stream()
+                .map(mapper::toTodoListResponseDTO)
+                .toList();
     }
 
     @Override
+    @Transactional
     public TodoListResponseDTO update(UUID id, TodoListRequestDTO dto) {
-        return null;
+        TodoList existing = repo.findById(id);
+        if (existing == null) {
+            throw new IllegalArgumentException("No existe la lista");
+        }
+        validateOwnership(existing);
+        existing.setName(dto.name());
+        TodoList updated = repo.save(existing);
+        return mapper.toTodoListResponseDTO(updated);
     }
 
     @Override
-    public void delete(UUID id) {
+    @Transactional
+    public void delete(UUID id, UUID projectId) {
+        TodoList todoList = repo.findByIdAndProjectId(id, projectId);
+        if (todoList == null) {
+            throw new IllegalArgumentException("No existe la lista en ese proyecto");
+        }
+        validateOwnership(todoList);
+        repo.delete(id, projectId);
+    }
 
+    @Override
+    public List<TodoListResponseDTO> getByProject(UUID projectId) {
+        if (!projectRepository.existsById(projectId)) {
+            throw new IllegalArgumentException("El proyecto no existe");
+        }
+        List<TodoList> todoLists = repo.findByProjectId(projectId);
+        todoLists.forEach(this::validateOwnership);
+        return todoLists.stream()
+                .map(mapper::toTodoListResponseDTO)
+                .toList();
+    }
+
+    @Override
+    public TodoListResponseDTO getByIdAndProject(UUID id, UUID projectId) {
+        TodoList todoList = repo.findByIdAndProjectId(id, projectId);
+        if (todoList == null) {
+            throw new IllegalArgumentException("No existe la lista en ese proyecto");
+        }
+        validateOwnership(todoList);
+        return mapper.toTodoListResponseDTO(todoList);
     }
 
     private void validateOwnership(TodoList todoList) {
