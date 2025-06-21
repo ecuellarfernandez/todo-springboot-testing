@@ -54,7 +54,7 @@ public class TodoListService implements TodoListUseCase {
     @Override
     public TodoListResponseDTO getById(UUID id) {
         TodoList todoList = repo.findById(id);
-        validateOwnership(todoList);
+        validateOwnership(todoList.getId(), todoList.getProjectId());
         return mapper.toTodoListResponseDTO(todoList);
     }
 
@@ -62,7 +62,7 @@ public class TodoListService implements TodoListUseCase {
     public List<TodoListResponseDTO> getByUser() {
         User currentUser = userProvider.getCurrentUser();
         List<TodoList> todoLists = repo.findByUserId(currentUser.getId());
-        todoLists.forEach(this::validateOwnership);
+        todoLists.forEach(tl -> validateOwnership(tl.getId(), tl.getProjectId()));
         return todoLists.stream()
                 .map(mapper::toTodoListResponseDTO)
                 .toList();
@@ -75,7 +75,7 @@ public class TodoListService implements TodoListUseCase {
         if (existing == null) {
             throw new IllegalArgumentException("No existe la lista");
         }
-        validateOwnership(existing);
+        validateOwnership(existing.getId(), existing.getProjectId());
         existing.setName(dto.name());
         TodoList updated = repo.save(existing);
         return mapper.toTodoListResponseDTO(updated);
@@ -88,7 +88,7 @@ public class TodoListService implements TodoListUseCase {
         if (todoList == null) {
             throw new IllegalArgumentException("No existe la lista en ese proyecto");
         }
-        validateOwnership(todoList);
+        validateOwnership(todoList.getId(), projectId);
         repo.delete(id, projectId);
     }
 
@@ -98,7 +98,7 @@ public class TodoListService implements TodoListUseCase {
             throw new IllegalArgumentException("El proyecto no existe");
         }
         List<TodoList> todoLists = repo.findByProjectId(projectId);
-        todoLists.forEach(this::validateOwnership);
+        todoLists.forEach(tl -> validateOwnership(tl.getId(), tl.getProjectId()));
         return todoLists.stream()
                 .map(mapper::toTodoListResponseDTO)
                 .toList();
@@ -110,11 +110,11 @@ public class TodoListService implements TodoListUseCase {
         if (todoList == null) {
             throw new IllegalArgumentException("No existe la lista en ese proyecto");
         }
-        validateOwnership(todoList);
+        validateOwnership(todoList.getId(), projectId);
         return mapper.toTodoListResponseDTO(todoList);
     }
 
-    private void validateOwnership(TodoList todoList) {
-        ownershipValidator.validateTodoListOwnership(todoList);
+    private void validateOwnership(UUID todoListId, UUID projectId) {
+        ownershipValidator.validateTodoListOwnership(todoListId, projectId);
     }
 }
