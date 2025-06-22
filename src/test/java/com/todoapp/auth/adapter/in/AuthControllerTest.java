@@ -10,8 +10,8 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import com.todoapp.config.JwtFilter;
 
@@ -29,16 +29,16 @@ class AuthControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private LoginUseCase loginUseCase;
 
-    @MockBean
+    @MockitoBean
     private UserContextUseCase userContextUseCase;
 
-    @MockBean
+    @MockitoBean
     private JwtFilter jwtFilter;
 
-    @MockBean
+    @MockitoBean
     private com.todoapp.auth.port.out.JwtEncoder jwtEncoder;
 
     @Test
