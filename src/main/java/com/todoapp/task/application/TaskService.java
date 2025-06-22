@@ -38,9 +38,8 @@ public class TaskService implements TaskUseCase {
     @Override
     @Transactional
     public TaskResponseDTO create(TaskCreateDTO dto) {
-        TodoList todoList = todoListRepository.findById(dto.todoListId());
-        Project project = projectRepository.findById(todoList.getProjectId());
-        ownershipValidator.validateProjectOwnership(project);
+        UUID todoListId = dto.todoListId();
+        UUID projectId = dto.projectId();
 
         Task task = new Task(
                 null,
@@ -48,8 +47,10 @@ public class TaskService implements TaskUseCase {
                 dto.description(),
                 false,
                 dto.dueDate(),
-                dto.todoListId()
+                todoListId
         );
+
+        validateOwnership(todoListId, projectId);
 
         Task saved = repo.save(task);
         return mapper.toResponseDTO(saved);
@@ -57,21 +58,22 @@ public class TaskService implements TaskUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public TaskResponseDTO getById(UUID id) {
+    public TaskResponseDTO getById(UUID id, UUID todoListId, UUID projectId) {
+        if(!repo.existsById(id)){
+            throw new IllegalArgumentException("Task with ID " + id + " does not exist.");
+        }
+        validateOwnership(todoListId, projectId);
         Task task = repo.findById(id);
-        TodoList todoList = todoListRepository.findById(task.getTodoListId());
-        Project project = projectRepository.findById(todoList.getProjectId());
-        ownershipValidator.validateProjectOwnership(project);
-
+        if (!task.getTodoListId().equals(todoListId)) {
+            throw new IllegalArgumentException("La tarea no pertenece a la lista de tareas especificada.");
+        }
         return mapper.toResponseDTO(task);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<TaskResponseDTO> getByTodoListId(UUID todoListId, UUID projectId) {
-        TodoList todoList = todoListRepository.findById(todoListId);
-        Project project = projectRepository.findById(todoList.getProjectId());
-        ownershipValidator.validateProjectOwnership(project);
+        validateOwnership(todoListId, projectId);
 
         List<Task> tasks = repo.findByTodoListId(todoListId);
         return tasks.stream()
@@ -82,58 +84,63 @@ public class TaskService implements TaskUseCase {
 
     @Override
     @Transactional
-    public TaskResponseDTO update(UUID id, TaskUpdateDTO dto) {
+    public TaskResponseDTO update(UUID id, TaskUpdateDTO dto, UUID todoListId, UUID projectId) {
         if(!repo.existsById(id)){
             throw new IllegalArgumentException("Task with ID " + id + " does not exist.");
         }
 
         Task task = repo.findById(id);
-        TodoList todoList = todoListRepository.findById(task.getTodoListId());
-        Project project = projectRepository.findById(todoList.getProjectId());
-        ownershipValidator.validateProjectOwnership(project);
 
-        if (dto.title() != null) {
-            task.setTitle(dto.title());
-        }
-        if (dto.description() != null) {
-            task.setDescription(dto.description());
-        }
-        if (dto.dueDate() != null) {
-            task.setDueDate(dto.dueDate());
+        if(!task.getTodoListId().equals(todoListId)) {
+            throw new IllegalArgumentException("La tarea no pertenece a la lista de tareas especificada.");
         }
 
-        Task updated = repo.save(task);
-        return mapper.toResponseDTO(updated);
+        validateOwnership(todoListId, projectId);
+
+        task.setTitle(dto.title());
+        task.setDescription(dto.description());
+        task.setDueDate(dto.dueDate());
+        Task updatedTask = repo.save(task);
+        return mapper.toResponseDTO(updatedTask);
     }
 
     @Override
-    public TaskResponseDTO updateStatus(UUID id, TaskStatusUpdateDTO dto) {
+    public TaskResponseDTO updateStatus(UUID id, TaskStatusUpdateDTO dto, UUID todoListId, UUID projectId) {
         if(!repo.existsById(id)){
             throw new IllegalArgumentException("Task with ID " + id + " does not exist.");
         }
 
         Task task = repo.findById(id);
-        TodoList todoList = todoListRepository.findById(task.getTodoListId());
-        Project project = projectRepository.findById(todoList.getProjectId());
-        ownershipValidator.validateProjectOwnership(project);
+
+        if (!task.getTodoListId().equals(todoListId)) {
+            throw new IllegalArgumentException("La tarea no pertenece a la lista de tareas especificada.");
+        }
+
+        validateOwnership(todoListId, projectId);
 
         task.setCompleted(dto.completed());
-        Task updated = repo.save(task);
-        return mapper.toResponseDTO(updated);
+        Task updatedTask = repo.save(task);
+        return mapper.toResponseDTO(updatedTask);
     }
 
     @Override
     @Transactional
-    public void delete(UUID id) {
+    public void delete(UUID id, UUID todoListId, UUID projectId) {
         if(!repo.existsById(id)){
             throw new IllegalArgumentException("Task with ID " + id + " does not exist.");
         }
 
         Task task = repo.findById(id);
-        TodoList todoList = todoListRepository.findById(task.getTodoListId());
-        Project project = projectRepository.findById(todoList.getProjectId());
-        ownershipValidator.validateProjectOwnership(project);
+        if (!task.getTodoListId().equals(todoListId)) {
+            throw new IllegalArgumentException("La tarea no pertenece a la lista de tareas especificada.");
+        }
+
+        validateOwnership(todoListId, projectId);
 
         repo.delete(id);
+    }
+
+    private void validateOwnership(UUID todoListId, UUID projectId) {
+        ownershipValidator.validateTodoListOwnership(todoListId, projectId);
     }
 }
