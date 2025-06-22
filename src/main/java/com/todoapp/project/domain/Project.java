@@ -15,7 +15,7 @@ public class Project {
         this.name = name;
         this.description = description;
         this.userId = userId;
-        this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
+        this.createdAt = createdAt;
     }
 
     // Getters y setters
