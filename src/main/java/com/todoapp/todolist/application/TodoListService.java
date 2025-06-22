@@ -46,6 +46,8 @@ public class TodoListService implements TodoListUseCase {
                 dto.projectId()
         );
 
+        validateProjectOwnership(dto.projectId());
+
         TodoList saved = repo.save(todolist);
 
         return mapper.toTodoListResponseDTO(saved);
@@ -116,5 +118,9 @@ public class TodoListService implements TodoListUseCase {
 
     private void validateOwnership(UUID todoListId, UUID projectId) {
         ownershipValidator.validateTodoListOwnership(todoListId, projectId);
+    }
+
+    private void validateProjectOwnership(UUID projectId){
+        ownershipValidator.validateProjectOwnership(projectId);
     }
 }
