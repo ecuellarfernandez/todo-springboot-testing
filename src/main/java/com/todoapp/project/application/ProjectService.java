@@ -56,7 +56,7 @@ public class ProjectService implements ProjectUseCase {
     @Transactional(readOnly = true)
     public ProjectResponseDTO getById(UUID id) {
         Project project = repo.findById(id);
-        validateOwnership(project);
+        validateOwnership(project.getId());
         return mapper.toResponseDTO(project);
     }
 
@@ -73,7 +73,7 @@ public class ProjectService implements ProjectUseCase {
     @Transactional
     public ProjectResponseDTO update(UUID id, ProjectUpdateDTO dto) {
         Project project = repo.findById(id);
-        validateOwnership(project);
+        validateOwnership(project.getId());
 
         if (dto.name() != null) {
             project.setName(dto.name());
@@ -90,11 +90,11 @@ public class ProjectService implements ProjectUseCase {
     @Transactional
     public void delete(UUID id) {
         Project project = repo.findById(id);
-        validateOwnership(project);
+        validateOwnership(project.getId());
         repo.delete(id);
     }
 
-    private void validateOwnership(Project project) {
-        ownershipValidator.validateProjectOwnership(project);
+    private void validateOwnership(UUID projectId) {
+        ownershipValidator.validateProjectOwnership(projectId);
     }
 }
