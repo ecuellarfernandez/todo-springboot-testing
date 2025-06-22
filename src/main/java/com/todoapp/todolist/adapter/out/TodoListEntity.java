@@ -24,4 +24,45 @@ public class TodoListEntity {
     @OneToMany(mappedBy = "todoList", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TaskEntity> tasks;
 
+    public TodoListEntity() {
+    }
+
+    public TodoListEntity(UUID id, String name, ProjectEntity project, List<TaskEntity> tasks) {
+        this.id = id;
+        this.name = name;
+        this.project = project;
+        this.tasks = tasks;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public ProjectEntity getProject() {
+        return project;
+    }
+
+    public void setProject(ProjectEntity project) {
+        this.project = project;
+    }
+
+    public List<TaskEntity> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(List<TaskEntity> tasks) {
+        this.tasks = tasks;
+    }
 }

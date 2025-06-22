@@ -1,6 +1,8 @@
 package com.todoapp.project.application;
 
 import com.todoapp.auth.port.in.UserContextUseCase;
+import com.todoapp.common.OwnershipValidator;
+import com.todoapp.common.UserProvider;
 import com.todoapp.project.application.mapper.ProjectMapper;
 import com.todoapp.project.domain.Project;
 import com.todoapp.project.dto.ProjectRequestDTO;
@@ -23,18 +25,20 @@ public class ProjectService implements ProjectUseCase {
 
     private final ProjectRepository repo;
     private final ProjectMapper mapper;
-    private final UserContextUseCase userContext;
+    private final OwnershipValidator ownershipValidator;
+    private final UserProvider userProvider;
 
-    public ProjectService(ProjectRepository repo, ProjectMapper mapper, UserContextUseCase userContext) {
+    public ProjectService(ProjectRepository repo, ProjectMapper mapper, OwnershipValidator ownershipValidator, UserProvider userProvider) {
         this.repo = repo;
         this.mapper = mapper;
-        this.userContext = userContext;
+        this.ownershipValidator = ownershipValidator;
+        this.userProvider = userProvider;
     }
 
     @Override
     @Transactional
     public ProjectResponseDTO create(ProjectRequestDTO dto) {
-        User currentUser = getCurrentUser();
+        User currentUser = userProvider.getCurrentUser();
 
         Project project = new Project(
                 null,
@@ -52,14 +56,14 @@ public class ProjectService implements ProjectUseCase {
     @Transactional(readOnly = true)
     public ProjectResponseDTO getById(UUID id) {
         Project project = repo.findById(id);
-        validateOwnership(project);
+        validateOwnership(project.getId());
         return mapper.toResponseDTO(project);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ProjectResponseDTO> getByUser() {
-        User currentUser = getCurrentUser();
+        User currentUser = userProvider.getCurrentUser();
         return repo.findByUserId(currentUser.getId()).stream()
                 .map(mapper::toResponseDTO)
                 .collect(Collectors.toList());
@@ -69,7 +73,7 @@ public class ProjectService implements ProjectUseCase {
     @Transactional
     public ProjectResponseDTO update(UUID id, ProjectUpdateDTO dto) {
         Project project = repo.findById(id);
-        validateOwnership(project);
+        validateOwnership(project.getId());
 
         if (dto.name() != null) {
             project.setName(dto.name());
@@ -86,20 +90,11 @@ public class ProjectService implements ProjectUseCase {
     @Transactional
     public void delete(UUID id) {
         Project project = repo.findById(id);
-        validateOwnership(project);
+        validateOwnership(project.getId());
         repo.delete(id);
     }
 
-    private User getCurrentUser() {
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        String token = attributes.getRequest().getHeader("Authorization").substring(7);
-        return userContext.getCurrentUser(token);
-    }
-
-    private void validateOwnership(Project project) {
-        User currentUser = getCurrentUser();
-        if (!project.getUserId().equals(currentUser.getId())) {
-            throw new SecurityException("No tienes permiso para acceder a este proyecto");
-        }
+    private void validateOwnership(UUID projectId) {
+        ownershipValidator.validateProjectOwnership(projectId);
     }
 }

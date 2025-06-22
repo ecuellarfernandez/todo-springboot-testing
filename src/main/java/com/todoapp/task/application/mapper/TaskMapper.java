@@ -1,19 +1,16 @@
 package com.todoapp.task.application.mapper;
 
+import com.todoapp.task.adapter.out.TaskEntity;
 import com.todoapp.task.domain.Task;
 import com.todoapp.task.dto.TaskResponseDTO;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
 
-@Component
-public class TaskMapper {
-    public TaskResponseDTO toResponseDTO(Task task) {
-        return new TaskResponseDTO(
-                task.getId(),
-                task.getTitle(),
-                task.getDescription(),
-                task.isCompleted(),
-                task.getDueDate(),
-                task.getTodoListId()
-        );
-    }
+import java.util.List;
+
+@Mapper(componentModel = "spring")
+public interface TaskMapper {
+    Task entityToDomain(TaskEntity taskEntity);
+    TaskEntity domainToEntity(Task task);
+    TaskResponseDTO toResponseDTO(Task task);
+    List<Task> entitiesToDomains(List<TaskEntity> taskEntities);
 }
