@@ -5,6 +5,7 @@ import com.todoapp.common.UserProvider;
 import com.todoapp.project.port.out.ProjectRepository;
 import com.todoapp.todolist.domain.TodoList;
 import com.todoapp.todolist.domain.mapper.TodoListMapper;
+import com.todoapp.todolist.dto.TodoListCreateDTO;
 import com.todoapp.todolist.dto.TodoListRequestDTO;
 import com.todoapp.todolist.dto.TodoListResponseDTO;
 import com.todoapp.todolist.port.in.TodoListUseCase;
@@ -35,7 +36,7 @@ public class TodoListService implements TodoListUseCase {
 
     @Override
     @Transactional
-    public TodoListResponseDTO create(TodoListRequestDTO dto) {
+    public TodoListResponseDTO create(TodoListCreateDTO dto) {
         if(!projectRepository.existsById(dto.projectId())) {
             throw new IllegalArgumentException("Project does not exist");
         }
