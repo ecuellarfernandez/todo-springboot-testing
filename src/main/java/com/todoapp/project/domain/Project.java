@@ -1,6 +1,5 @@
 package com.todoapp.project.domain;
 
-import java.beans.ConstructorProperties;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -9,24 +8,19 @@ public class Project {
     private String name;
     private String description;
     private UUID userId;
-    private LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
 
-    @ConstructorProperties({"id", "name", "description", "userId", "createdAt"})
     public Project(UUID id, String name, String description, UUID userId, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.userId = userId;
-        this.createdAt = createdAt;
+        this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
     }
 
     // Getters y setters
     public LocalDateTime getCreatedAt() {
         return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 
     public UUID getId() {
