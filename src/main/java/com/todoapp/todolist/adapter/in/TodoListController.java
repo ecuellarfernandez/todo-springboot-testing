@@ -1,5 +1,6 @@
 package com.todoapp.todolist.adapter.in;
 
+import com.todoapp.todolist.dto.TodoListCreateDTO;
 import com.todoapp.todolist.dto.TodoListRequestDTO;
 import com.todoapp.todolist.dto.TodoListResponseDTO;
 import com.todoapp.todolist.port.in.TodoListUseCase;
@@ -24,9 +25,8 @@ public class TodoListController {
     public ResponseEntity<TodoListResponseDTO> create(
             @PathVariable UUID projectId,
             @Valid @RequestBody TodoListRequestDTO dto) {
-        // Asegurar de que el DTO reciba el projectId
-        TodoListRequestDTO dtoWithProject = new TodoListRequestDTO(dto.name(), projectId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(useCase.create(dtoWithProject));
+        TodoListCreateDTO todoListCreateDTO = new TodoListCreateDTO(dto.name(), projectId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(useCase.create(todoListCreateDTO));
     }
 
     @GetMapping
