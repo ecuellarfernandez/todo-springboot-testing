@@ -1,5 +1,5 @@
 package com.todoapp.task.dto;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 public record TaskResponseDTO(
@@ -7,6 +7,7 @@ public record TaskResponseDTO(
         String title,
         String description,
         String completed,
-        LocalDateTime dueDate,
-        UUID todoListId
+        LocalDate dueDate,
+        UUID todoListId,
+        UUID projectId
 ) {}

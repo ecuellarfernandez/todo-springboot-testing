@@ -10,6 +10,7 @@ public class Task {
     private boolean completed;
     private LocalDate dueDate;
     private UUID todoListId;
+    private UUID projectId;
 
     public Task(UUID id, String title, String description, boolean completed,
                 LocalDate dueDate, UUID todoListId) {
@@ -67,5 +68,13 @@ public class Task {
 
     public void setTodoListId(UUID todoListId) {
         this.todoListId = todoListId;
+    }
+
+    public UUID getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(UUID projectId) {
+        this.projectId = projectId;
     }
 }
