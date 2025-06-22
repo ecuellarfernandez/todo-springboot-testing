@@ -1,6 +1,6 @@
 package com.todoapp.task.domain;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 public class Task {
@@ -8,11 +8,11 @@ public class Task {
     private String title;
     private String description;
     private boolean completed;
-    private LocalDateTime dueDate;
+    private LocalDate dueDate;
     private UUID todoListId;
 
     public Task(UUID id, String title, String description, boolean completed,
-                LocalDateTime dueDate, UUID todoListId) {
+                LocalDate dueDate, UUID todoListId) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -53,11 +53,11 @@ public class Task {
         this.completed = completed;
     }
 
-    public LocalDateTime getDueDate() {
+    public LocalDate getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(LocalDateTime dueDate) {
+    public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
     }
 

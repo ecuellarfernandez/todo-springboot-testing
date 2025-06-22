@@ -1,9 +1,9 @@
 package com.todoapp.task.dto;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public record TaskUpdateDTO(
         String title,
         String description,
-        LocalDateTime dueDate
+        LocalDate dueDate
 ) {}
