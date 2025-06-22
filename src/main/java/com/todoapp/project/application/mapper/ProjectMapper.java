@@ -12,12 +12,10 @@ import java.util.List;
 public interface ProjectMapper {
 
     @Mapping(source = "userId", target = "userId")
-    @Mapping(source = "createdAt", target = "createdAt")
     ProjectResponseDTO toResponseDTO(Project project);
 
     @Mapping(target = "owner", ignore = true)
     @Mapping(target = "todoLists", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
     ProjectEntity domainToEntity(Project project);
 
     List<Project> entitiesToDomains(List<ProjectEntity> entities);
