@@ -1,11 +1,13 @@
 package com.todoapp.todolist.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
-public record TodoListRequestDTO(
+public record TodoListUpdateDTO(
         @NotBlank(message = "El nombre es obligatorio")
-        String name
-){}
+        String name,
+        @NotBlank(message = "El ID del proyecto es obligatorio")
+        UUID projectId
+) {
+}

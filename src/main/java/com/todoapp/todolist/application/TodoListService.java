@@ -8,6 +8,7 @@ import com.todoapp.todolist.domain.mapper.TodoListMapper;
 import com.todoapp.todolist.dto.TodoListCreateDTO;
 import com.todoapp.todolist.dto.TodoListRequestDTO;
 import com.todoapp.todolist.dto.TodoListResponseDTO;
+import com.todoapp.todolist.dto.TodoListUpdateDTO;
 import com.todoapp.todolist.port.in.TodoListUseCase;
 import com.todoapp.todolist.port.out.TodoListRepository;
 import com.todoapp.user.domain.User;
@@ -73,7 +74,7 @@ public class TodoListService implements TodoListUseCase {
 
     @Override
     @Transactional
-    public TodoListResponseDTO update(UUID id, TodoListRequestDTO dto) {
+    public TodoListResponseDTO update(UUID id, TodoListUpdateDTO dto) {
         TodoList existing = repo.findById(id);
         if (existing == null) {
             throw new IllegalArgumentException("No existe la lista");

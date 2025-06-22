@@ -3,6 +3,7 @@ package com.todoapp.todolist.adapter.in;
 import com.todoapp.todolist.dto.TodoListCreateDTO;
 import com.todoapp.todolist.dto.TodoListRequestDTO;
 import com.todoapp.todolist.dto.TodoListResponseDTO;
+import com.todoapp.todolist.dto.TodoListUpdateDTO;
 import com.todoapp.todolist.port.in.TodoListUseCase;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -47,8 +48,8 @@ public class TodoListController {
             @PathVariable UUID projectId,
             @PathVariable UUID id,
             @Valid @RequestBody TodoListRequestDTO dto) {
-        TodoListRequestDTO dtoWithProject = new TodoListRequestDTO(dto.name(), projectId);
-        return ResponseEntity.ok(useCase.update(id, dtoWithProject));
+        TodoListUpdateDTO todoListUpdateDTO = new TodoListUpdateDTO(dto.name(), projectId);
+        return ResponseEntity.ok(useCase.update(id, todoListUpdateDTO));
     }
 
     @DeleteMapping("/{id}")
