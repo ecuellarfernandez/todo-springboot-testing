@@ -110,5 +110,21 @@ class AuthControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    // Puedes agregar más tests para casos de error, por ejemplo login fallido, etc.
-} 
+    @Test
+    void shouldReturn400OnInvalidRegistrationData() throws Exception {
+        String json = """
+                {
+                    "username": "",
+                    "name": "",
+                    "email": "email-no-valid",
+                    "password": "123"
+                }
+                """;
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isBadRequest());
+    }
+
+}
