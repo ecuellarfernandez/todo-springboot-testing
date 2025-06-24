@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AuthController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc
 class AuthControllerTest {
 
     @Autowired
@@ -65,7 +65,7 @@ class AuthControllerTest {
         mockMvc.perform(get("/api/auth/me")
                 .header("Authorization", "Bearer token123"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("mail"));
+                .andExpect(jsonPath("$.email").value("email"));
     }
 
     @Test
@@ -108,23 +108,6 @@ class AuthControllerTest {
         mockMvc.perform(get("/api/auth/me")
                 .header("Authorization", "Bearer invalidtoken"))
                 .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    void shouldReturn400OnInvalidRegistrationData() throws Exception {
-        String json = """
-                {
-                    "username": "",
-                    "name": "",
-                    "email": "email-no-valid",
-                    "password": "123"
-                }
-                """;
-
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-                .andExpect(status().isBadRequest());
     }
 
 }

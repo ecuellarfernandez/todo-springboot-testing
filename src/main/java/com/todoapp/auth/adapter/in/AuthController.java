@@ -1,6 +1,7 @@
 package com.todoapp.auth.adapter.in;
 import com.todoapp.auth.dto.LoginRequestDTO;
 import com.todoapp.auth.dto.AuthResponseDTO;
+import com.todoapp.auth.dto.UserMeResponseDTO;
 import com.todoapp.auth.port.in.LoginUseCase;
 import com.todoapp.auth.port.in.UserContextUseCase;
 import com.todoapp.user.domain.User;
@@ -28,9 +29,8 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<User> me(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        User user = userContextUseCase.getCurrentUser(token);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<UserMeResponseDTO> me(@RequestHeader("Authorization") String authHeader) {
+        UserMeResponseDTO userResponse = userContextUseCase.getCurrentUserInfo(authHeader);
+        return ResponseEntity.ok(userResponse);
     }
 }

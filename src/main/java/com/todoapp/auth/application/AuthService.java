@@ -2,6 +2,7 @@ package com.todoapp.auth.application;
 
 import com.todoapp.auth.dto.LoginRequestDTO;
 import com.todoapp.auth.dto.AuthResponseDTO;
+import com.todoapp.auth.dto.UserMeResponseDTO;
 import com.todoapp.auth.port.in.LoginUseCase;
 import com.todoapp.auth.port.in.UserContextUseCase;
 import com.todoapp.auth.port.out.JwtEncoder;
@@ -48,5 +49,17 @@ public class AuthService implements LoginUseCase, UserContextUseCase {
     public User getCurrentUser(String token) {
         String email = jwtEncoder.extractUsername(token);
         return credentials.findByEmail(email);
+    }
+
+    @Override
+    public UserMeResponseDTO getCurrentUserInfo(String autHeader) {
+        String token = autHeader.replace("Bearer ", "");
+        User user = getCurrentUser(token);
+        return new UserMeResponseDTO(
+                user.getId(),
+                user.getUsername(),
+                user.getName(),
+                user.getEmail()
+        );
     }
 }
