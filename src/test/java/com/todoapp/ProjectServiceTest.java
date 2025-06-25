@@ -2,6 +2,7 @@ package com.todoapp;
 
 import com.todoapp.common.OwnershipValidator;
 import com.todoapp.common.UserProvider;
+import com.todoapp.common.exception.OwnershipException;
 import com.todoapp.project.application.ProjectService;
 import com.todoapp.project.application.mapper.ProjectMapper;
 import com.todoapp.project.domain.Project;
@@ -12,6 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import static org.mockito.Mockito.doThrow;
+
 
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -65,5 +68,27 @@ public class ProjectServiceTest {
             service.getById(projectId);
         });
         verify(repository).findById(projectId);
+    }
+
+    @Test
+    void shouldThrowIfUserIsNotOwner(){
+        UUID projectId = UUID.randomUUID();
+        Project project = new Project
+                (projectId,
+                        "Test Project",
+                        "Description",
+                        UUID.randomUUID(),
+                        null
+                );
+        when(repository.findById(projectId)).thenReturn(project); //simula que el encont el proyecto
+
+
+        doThrow(new OwnershipException("No autorizado")) //si el user no es el dueño del proyect
+                .when(ownershipValidator).validateProjectOwnership(projectId);
+
+        assertThrows(OwnershipException.class, () -> {
+            service.getById(projectId);
+        });
+        verify(ownershipValidator).validateProjectOwnership(projectId);
     }
 }
