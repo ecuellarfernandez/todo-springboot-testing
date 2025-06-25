@@ -4,12 +4,14 @@ import com.todoapp.auth.dto.AuthResponseDTO;
 import com.todoapp.auth.dto.LoginRequestDTO;
 import com.todoapp.auth.port.in.LoginUseCase;
 import com.todoapp.auth.port.in.UserContextUseCase;
+import com.todoapp.auth.port.out.JwtEncoder;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import com.todoapp.config.JwtFilter;
@@ -34,7 +36,10 @@ class AuthControllerTest {
     private JwtFilter jwtFilter;
 
     @MockitoBean
-    private com.todoapp.auth.port.out.JwtEncoder jwtEncoder;
+    private JwtEncoder jwtEncoder;
+
+    @MockitoBean
+    private AuthenticationManager authenticationManager;
 
     @Test
     void shouldLoginSuccessfully() throws Exception {
