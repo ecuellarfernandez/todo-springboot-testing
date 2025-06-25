@@ -13,9 +13,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,7 +35,6 @@ public class ProjectServiceTest {
 
     @Test
     public void shouldReturnProjectWhenUserOwnsIt() {
-
         UUID projectId = UUID.randomUUID();
         Project project = new Project(projectId, "Test Project", "Description", UUID.randomUUID(), null);
         ProjectResponseDTO expectedResponse = new ProjectResponseDTO(
@@ -52,5 +53,17 @@ public class ProjectServiceTest {
 
         assertEquals(expectedResponse, result);
         verify(ownershipValidator).validateProjectOwnership(projectId);
+    }
+
+    @Test
+    void shouldThrowWhenProjectNotFound() {
+        UUID projectId = UUID.randomUUID();
+
+        when(repository.findById(projectId)).thenThrow(new NoSuchElementException("Proyecto no existe"));
+
+        assertThrows(NoSuchElementException.class, () -> {
+            service.getById(projectId);
+        });
+        verify(repository).findById(projectId);
     }
 }
