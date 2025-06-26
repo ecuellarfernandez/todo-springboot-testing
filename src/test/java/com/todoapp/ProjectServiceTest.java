@@ -7,6 +7,7 @@ import com.todoapp.project.application.ProjectService;
 import com.todoapp.project.application.mapper.ProjectMapper;
 import com.todoapp.project.domain.Project;
 import com.todoapp.project.dto.ProjectResponseDTO;
+import com.todoapp.project.dto.ProjectUpdateDTO;
 import com.todoapp.project.port.out.ProjectRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -71,7 +72,7 @@ public class ProjectServiceTest {
     }
 
     @Test
-    void shouldThrowIfUserIsNotOwner(){
+    void shouldThrowIfUserIsNotOwner() {
         UUID projectId = UUID.randomUUID();
         Project project = new Project
                 (projectId,
@@ -91,4 +92,26 @@ public class ProjectServiceTest {
         });
         verify(ownershipValidator).validateProjectOwnership(projectId);
     }
+
+
+    @Test
+    void shouldUpdateProjectWhenUserIsOwner() {
+        UUID projectId = UUID.randomUUID();
+        Project existing = new Project(projectId, "Old Name", "Old Desc", UUID.randomUUID(), null);
+        ProjectUpdateDTO updateDTO = new ProjectUpdateDTO("New Name", null);
+
+        Project updated = new Project(projectId, "New Name", "Old Desc", existing.getUserId(), null);
+        ProjectResponseDTO expected = new ProjectResponseDTO(projectId, "New Name", "Old Desc", null, null);
+
+        when(repository.findById(projectId)).thenReturn(existing);
+        when(repository.save(existing)).thenReturn(updated);
+        when(mapper.toResponseDTO(updated)).thenReturn(expected);
+
+        ProjectResponseDTO result = service.update(projectId, updateDTO);
+
+        assertEquals(expected, result);
+        verify(ownershipValidator).validateProjectOwnership(projectId);
+        verify(repository).save(existing);
+    }
+
 }
