@@ -113,5 +113,19 @@ public class ProjectServiceTest {
         verify(ownershipValidator).validateProjectOwnership(projectId);
         verify(repository).save(existing);
     }
+    @Test
+    void shouldDeleteProjectWhenUserIsOwner() {
+        UUID projectId = UUID.randomUUID();
+        Project project = new Project(projectId, "ToDelete", "Desc", UUID.randomUUID(), null);
+
+        when(repository.findById(projectId)).thenReturn(project);
+        doNothing().when(ownershipValidator).validateProjectOwnership(projectId);
+        doNothing().when(repository).delete(projectId);
+
+        service.delete(projectId);
+
+        verify(ownershipValidator).validateProjectOwnership(projectId);
+        verify(repository).delete(projectId);
+    }
 
 }
