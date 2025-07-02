@@ -30,8 +30,14 @@ public class ProjectRepositoryImpl implements ProjectRepository {
 
     @Override
     public Project save(Project project) {
-        ProjectEntity entity = mapper.domainToEntity(project);
-        entity.setOwner(entityManager.getReference(UserEntity.class, project.getUserId()));
+        ProjectEntity entity;
+        if (project.getId() != null && jpaRepository.existsById(project.getId())) {
+            entity = jpaRepository.findById(project.getId()).orElseThrow();
+            entity.setName(project.getName());
+        } else {
+            entity = mapper.domainToEntity(project);
+            entity.setOwner(entityManager.getReference(UserEntity.class, project.getUserId()));
+        }
         ProjectEntity savedEntity = jpaRepository.save(entity);
         return mapper.entityToDomain(savedEntity);
     }
