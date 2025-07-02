@@ -44,7 +44,7 @@ class TaskControllerTest {
     @Test
     void shouldCreateTaskSuccessfully() throws Exception {
         TaskResponseDTO response = new TaskResponseDTO(
-                taskId, "Test Task", "Test Description", "false", dueDate, todoListId, projectId
+                taskId, "Test Task", "Test Description", false, dueDate, todoListId, projectId
         );
 
         when(taskUseCase.create(any(TaskCreateDTO.class)))
@@ -78,7 +78,7 @@ class TaskControllerTest {
     @Test
     void shouldGetTaskByIdSuccessfully() throws Exception {
         TaskResponseDTO response = new TaskResponseDTO(
-                taskId, "Test Task", "Test Description", "false", dueDate, todoListId, projectId
+                taskId, "Test Task", "Test Description", false, dueDate, todoListId, projectId
         );
 
         when(taskUseCase.getById(taskId, todoListId, projectId))
@@ -94,10 +94,10 @@ class TaskControllerTest {
     @Test
     void shouldGetTasksByTodoListSuccessfully() throws Exception {
         TaskResponseDTO task1 = new TaskResponseDTO(
-                taskId, "Task 1", "Description 1", "false", dueDate, todoListId, projectId
+                taskId, "Task 1", "Description 1", false, dueDate, todoListId, projectId
         );
         TaskResponseDTO task2 = new TaskResponseDTO(
-                UUID.randomUUID(), "Task 2", "Description 2", "true", dueDate, todoListId, projectId
+                UUID.randomUUID(), "Task 2", "Description 2", true, dueDate, todoListId, projectId
         );
 
         when(taskUseCase.getByTodoListId(todoListId, projectId))
@@ -113,7 +113,7 @@ class TaskControllerTest {
     @Test
     void shouldUpdateTaskSuccessfully() throws Exception {
         TaskResponseDTO response = new TaskResponseDTO(
-                taskId, "Updated Task", "Updated Description", "false", dueDate, todoListId, projectId
+                taskId, "Updated Task", "Updated Description", false, dueDate, todoListId, projectId
         );
 
         when(taskUseCase.update(eq(taskId), any(TaskUpdateDTO.class), eq(todoListId), eq(projectId)))
@@ -134,7 +134,7 @@ class TaskControllerTest {
     @Test
     void shouldUpdateTaskStatusSuccessfully() throws Exception {
         TaskResponseDTO response = new TaskResponseDTO(
-                taskId, "Test Task", "Test Description", "true", dueDate, todoListId, projectId
+                taskId, "Test Task", "Test Description", true, dueDate, todoListId, projectId
         );
 
         when(taskUseCase.updateStatus(eq(taskId), any(TaskStatusUpdateDTO.class), eq(todoListId), eq(projectId)))
