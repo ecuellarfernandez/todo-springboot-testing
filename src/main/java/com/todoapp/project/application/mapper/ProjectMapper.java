@@ -15,7 +15,6 @@ public interface ProjectMapper {
     ProjectResponseDTO toResponseDTO(Project project);
 
     @Mapping(target = "owner", ignore = true)
-    @Mapping(target = "todoLists", ignore = true)
     ProjectEntity domainToEntity(Project project);
 
     List<Project> entitiesToDomains(List<ProjectEntity> entities);
