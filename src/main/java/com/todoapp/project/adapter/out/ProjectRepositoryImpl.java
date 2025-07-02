@@ -54,9 +54,6 @@ public class ProjectRepositoryImpl implements ProjectRepository {
     @Override
     public List<Project> findByUserId(UUID userId) {
         List<ProjectEntity> entities = jpaRepository.findByOwnerId(userId);
-        if (entities.isEmpty()) {
-            throw new NoSuchElementException("No se encontraron proyectos para el usuario con id: " + userId);
-        }
         return mapper.entitiesToDomains(entities);
     }
 
