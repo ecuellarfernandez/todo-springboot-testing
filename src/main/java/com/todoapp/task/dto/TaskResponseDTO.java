@@ -6,7 +6,7 @@ public record TaskResponseDTO(
         UUID id,
         String title,
         String description,
-        String completed,
+        boolean completed,
         LocalDate dueDate,
         UUID todoListId,
         UUID projectId
