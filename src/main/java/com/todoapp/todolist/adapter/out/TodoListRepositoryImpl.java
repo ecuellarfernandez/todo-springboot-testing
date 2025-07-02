@@ -57,9 +57,6 @@ public class TodoListRepositoryImpl implements TodoListRepository {
     @Override
     public List<TodoList> findByUserId(UUID userId) {
         List<TodoListEntity> entities = jpa.findByProject_Owner_Id(userId);
-        if (entities.isEmpty()) {
-            throw new NoSuchElementException("No se encontraron listas de tareas para el usuario con id: " + userId);
-        }
         return mapper.entitiesToDomains(entities);
     }
 
