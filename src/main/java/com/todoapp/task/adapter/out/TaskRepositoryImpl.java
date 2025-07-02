@@ -44,9 +44,6 @@ public class TaskRepositoryImpl implements TaskRepository {
     @Override
     public List<Task> findByTodoListId(UUID todoListId) {
         List<TaskEntity> entities = jpa.findByTodoListId(todoListId);
-        if (entities.isEmpty()) {
-            throw new NoSuchElementException("No se encontraron tareas para la lista de tareas con id: " + todoListId);
-        }
         return mapper.entitiesToDomains(entities);
     }
 
