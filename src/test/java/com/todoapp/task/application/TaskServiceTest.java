@@ -58,7 +58,7 @@ class TaskServiceTest {
         // Given
         TaskCreateDTO createDTO = new TaskCreateDTO("Test Task", "Test Description", dueDate, todoListId, projectId);
         Task task = new Task(taskId, "Test Task", "Test Description", false, dueDate, todoListId);
-        TaskResponseDTO expectedResponse = new TaskResponseDTO(taskId, "Test Task", "Test Description", "false", dueDate, todoListId, projectId);
+        TaskResponseDTO expectedResponse = new TaskResponseDTO(taskId, "Test Task", "Test Description", false, dueDate, todoListId, projectId);
 
         when(taskRepository.save(any(Task.class))).thenReturn(task);
         when(taskMapper.toResponseDTO(task)).thenReturn(expectedResponse);
@@ -77,7 +77,7 @@ class TaskServiceTest {
     void shouldGetTaskByIdSuccessfully() {
         // Given
         Task task = new Task(taskId, "Test Task", "Test Description", false, dueDate, todoListId);
-        TaskResponseDTO expectedResponse = new TaskResponseDTO(taskId, "Test Task", "Test Description", "false", dueDate, todoListId, projectId);
+        TaskResponseDTO expectedResponse = new TaskResponseDTO(taskId, "Test Task", "Test Description", false, dueDate, todoListId, projectId);
 
         when(taskRepository.existsById(taskId)).thenReturn(true);
         when(taskRepository.findById(taskId)).thenReturn(task);
@@ -124,8 +124,8 @@ class TaskServiceTest {
         // Given
         Task task1 = new Task(taskId, "Task 1", "Description 1", false, dueDate, todoListId);
         Task task2 = new Task(UUID.randomUUID(), "Task 2", "Description 2", true, dueDate, todoListId);
-        TaskResponseDTO response1 = new TaskResponseDTO(taskId, "Task 1", "Description 1", "false", dueDate, todoListId, projectId);
-        TaskResponseDTO response2 = new TaskResponseDTO(UUID.randomUUID(), "Task 2", "Description 2", "true", dueDate, todoListId, projectId);
+        TaskResponseDTO response1 = new TaskResponseDTO(taskId, "Task 1", "Description 1", false, dueDate, todoListId, projectId);
+        TaskResponseDTO response2 = new TaskResponseDTO(UUID.randomUUID(), "Task 2", "Description 2", true, dueDate, todoListId, projectId);
 
         when(taskRepository.findByTodoListId(todoListId)).thenReturn(Arrays.asList(task1, task2));
         when(taskMapper.toResponseDTO(task1)).thenReturn(response1);
@@ -148,7 +148,7 @@ class TaskServiceTest {
         TaskUpdateDTO updateDTO = new TaskUpdateDTO("Updated Task", "Updated Description", dueDate);
         Task task = new Task(taskId, "Original Task", "Original Description", false, dueDate, todoListId);
         Task updatedTask = new Task(taskId, "Updated Task", "Updated Description", false, dueDate, todoListId);
-        TaskResponseDTO expectedResponse = new TaskResponseDTO(taskId, "Updated Task", "Updated Description", "false", dueDate, todoListId, projectId);
+        TaskResponseDTO expectedResponse = new TaskResponseDTO(taskId, "Updated Task", "Updated Description", false, dueDate, todoListId, projectId);
 
         when(taskRepository.existsById(taskId)).thenReturn(true);
         when(taskRepository.findById(taskId)).thenReturn(task);
@@ -174,7 +174,7 @@ class TaskServiceTest {
         TaskStatusUpdateDTO statusDTO = new TaskStatusUpdateDTO(true);
         Task task = new Task(taskId, "Test Task", "Test Description", false, dueDate, todoListId);
         Task updatedTask = new Task(taskId, "Test Task", "Test Description", true, dueDate, todoListId);
-        TaskResponseDTO expectedResponse = new TaskResponseDTO(taskId, "Test Task", "Test Description", "true", dueDate, todoListId, projectId);
+        TaskResponseDTO expectedResponse = new TaskResponseDTO(taskId, "Test Task", "Test Description", true, dueDate, todoListId, projectId);
 
         when(taskRepository.existsById(taskId)).thenReturn(true);
         when(taskRepository.findById(taskId)).thenReturn(task);
