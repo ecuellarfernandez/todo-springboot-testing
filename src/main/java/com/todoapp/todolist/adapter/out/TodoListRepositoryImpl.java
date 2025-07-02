@@ -27,8 +27,14 @@ public class TodoListRepositoryImpl implements TodoListRepository {
 
     @Override
     public TodoList save(TodoList todoList) {
-        TodoListEntity entity = mapper.domainToEntity(todoList);
-        entity.setProject(entityManager.getReference(ProjectEntity.class, todoList.getProjectId()));
+        TodoListEntity entity;
+        if(todoList.getId() != null && jpa.existsById(todoList.getId())) {
+            entity = jpa.findById(todoList.getId()).orElseThrow();
+            entity.setName(todoList.getName());
+        }else{
+            entity = mapper.domainToEntity(todoList);
+            entity.setProject(entityManager.getReference(ProjectEntity.class, todoList.getProjectId()));
+        }
         TodoListEntity savedEntity = jpa.save(entity);
         return mapper.entityToDomain(savedEntity);
     }
