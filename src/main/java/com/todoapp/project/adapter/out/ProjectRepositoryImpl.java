@@ -34,6 +34,7 @@ public class ProjectRepositoryImpl implements ProjectRepository {
         if (project.getId() != null && jpaRepository.existsById(project.getId())) {
             entity = jpaRepository.findById(project.getId()).orElseThrow();
             entity.setName(project.getName());
+            entity.setDescription(project.getDescription());
         } else {
             entity = mapper.domainToEntity(project);
             entity.setOwner(entityManager.getReference(UserEntity.class, project.getUserId()));
