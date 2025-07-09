@@ -82,4 +82,25 @@ public class TaskController {
         useCase.delete(taskId, todoListId, projectId);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/reorder")
+    public ResponseEntity<?> reorderTasks(
+            @PathVariable UUID projectId,
+            @PathVariable UUID todoListId,
+            @RequestBody(required = false) TaskReorderDTO reorderDTO) {
+        if (reorderDTO == null || reorderDTO.getTaskIds() == null) {
+            return ResponseEntity.badRequest().body("El cuerpo de la petición debe incluir el campo 'taskIds' como un array.");
+        }
+        try {
+            List<TaskResponseDTO> updatedTasks = useCase.reorderTasks(projectId, todoListId, reorderDTO.getTaskIds());
+            return ResponseEntity.ok(updatedTasks);
+        } catch (org.springframework.web.server.ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error interno del servidor: " + (e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName()));
+        }
+    }
 }
