@@ -43,8 +43,10 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public List<Task> findByTodoListId(UUID todoListId) {
-        List<TaskEntity> entities = jpa.findByTodoListId(todoListId);
-        return mapper.entitiesToDomains(entities);
+        return jpa.findByTodoListIdOrderByPositionAsc(todoListId)
+                .stream()
+                .map(mapper::entityToDomain)
+                .toList();
     }
 
     @Override
