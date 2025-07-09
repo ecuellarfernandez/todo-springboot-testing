@@ -13,6 +13,8 @@ import com.todoapp.task.port.out.TaskRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -50,7 +52,7 @@ public class TaskService implements TaskUseCase {
                 todoListId
         );
 
-        validateOwnership(todoListId, projectId);
+        ownershipValidator.validateTodoListOwnership(todoListId, projectId);
 
         Task saved = repo.save(task);
         return mapper.toResponseDTO(saved);
@@ -62,7 +64,7 @@ public class TaskService implements TaskUseCase {
         if(!repo.existsById(id)){
             throw new IllegalArgumentException("Task with ID " + id + " does not exist.");
         }
-        validateOwnership(todoListId, projectId);
+        ownershipValidator.validateTodoListOwnership(todoListId, projectId);
         Task task = repo.findById(id);
         if (!task.getTodoListId().equals(todoListId)) {
             throw new IllegalArgumentException("La tarea no pertenece a la lista de tareas especificada.");
@@ -73,7 +75,7 @@ public class TaskService implements TaskUseCase {
     @Override
     @Transactional(readOnly = true)
     public List<TaskResponseDTO> getByTodoListId(UUID todoListId, UUID projectId) {
-        validateOwnership(todoListId, projectId);
+        ownershipValidator.validateTodoListOwnership(todoListId, projectId);
 
         List<Task> tasks = repo.findByTodoListId(todoListId);
         return tasks.stream()
@@ -95,7 +97,7 @@ public class TaskService implements TaskUseCase {
             throw new IllegalArgumentException("La tarea no pertenece a la lista de tareas especificada.");
         }
 
-        validateOwnership(todoListId, projectId);
+        ownershipValidator.validateTodoListOwnership(todoListId, projectId);
 
         task.setTitle(dto.title());
         task.setDescription(dto.description());
@@ -116,7 +118,7 @@ public class TaskService implements TaskUseCase {
             throw new IllegalArgumentException("La tarea no pertenece a la lista de tareas especificada.");
         }
 
-        validateOwnership(todoListId, projectId);
+        ownershipValidator.validateTodoListOwnership(todoListId, projectId);
 
         task.setCompleted(dto.completed());
         Task updatedTask = repo.save(task);
@@ -135,12 +137,38 @@ public class TaskService implements TaskUseCase {
             throw new IllegalArgumentException("La tarea no pertenece a la lista de tareas especificada.");
         }
 
-        validateOwnership(todoListId, projectId);
+        ownershipValidator.validateTodoListOwnership(todoListId, projectId);
 
         repo.delete(id);
     }
 
-    private void validateOwnership(UUID todoListId, UUID projectId) {
+    @Override
+    @Transactional
+    public List<TaskResponseDTO> reorderTasks(UUID projectId, UUID todoListId, List<String> taskIds) {
         ownershipValidator.validateTodoListOwnership(todoListId, projectId);
+        List<Task> tasks = repo.findByTodoListId(todoListId);
+        // Validar que todos los IDs existen y pertenecen a la lista
+        if (taskIds.size() != tasks.size() ||
+            !tasks.stream().allMatch(t -> taskIds.contains(t.getId().toString()))) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.BAD_REQUEST,
+                "Algunas tareas no pertenecen a la lista o faltan tareas"
+            );
+        }
+        // Actualizar posición y guardar en lote
+        for (int i = 0; i < taskIds.size(); i++) {
+            UUID taskId = UUID.fromString(taskIds.get(i));
+            Task task = tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst()
+                    .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.BAD_REQUEST,
+                        "Tarea no encontrada: " + taskId
+                    ));
+            task.setPosition(i);
+            repo.save(task);
+        }
+        // Recuperar y devolver ordenadas
+        List<Task> updated = new ArrayList<>(repo.findByTodoListId(todoListId));
+        updated.sort(Comparator.comparingInt(Task::getPosition));
+        return updated.stream().map(mapper::toResponseDTO).collect(Collectors.toList());
     }
 }
