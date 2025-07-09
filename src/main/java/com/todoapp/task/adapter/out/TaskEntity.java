@@ -23,6 +23,9 @@ public class TaskEntity {
 
     private LocalDate dueDate;
 
+    @Column(nullable = false)
+    private int position;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "todo_list_id", nullable = false)
     private TodoListEntity todoList;
@@ -77,6 +80,14 @@ public class TaskEntity {
 
     public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     public TodoListEntity getTodoList() {

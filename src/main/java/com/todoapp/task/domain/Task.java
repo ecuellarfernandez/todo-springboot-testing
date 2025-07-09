@@ -11,6 +11,7 @@ public class Task {
     private LocalDate dueDate;
     private UUID todoListId;
     private UUID projectId;
+    private int position;
 
     public Task(UUID id, String title, String description, boolean completed,
                 LocalDate dueDate, UUID todoListId) {
@@ -76,5 +77,13 @@ public class Task {
 
     public void setProjectId(UUID projectId) {
         this.projectId = projectId;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 }
