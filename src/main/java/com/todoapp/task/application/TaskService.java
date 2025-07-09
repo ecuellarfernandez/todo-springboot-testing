@@ -147,9 +147,8 @@ public class TaskService implements TaskUseCase {
     public List<TaskResponseDTO> reorderTasks(UUID projectId, UUID todoListId, List<String> taskIds) {
         ownershipValidator.validateTodoListOwnership(todoListId, projectId);
         List<Task> tasks = repo.findByTodoListId(todoListId);
-        // Validar que todos los IDs existen y pertenecen a la lista
-        if (taskIds.size() != tasks.size() ||
-            !tasks.stream().allMatch(t -> taskIds.contains(t.getId().toString()))) {
+        // Validar que todos los IDs enviados existen en la lista
+        if (!taskIds.stream().allMatch(id -> tasks.stream().anyMatch(t -> t.getId().toString().equals(id)))) {
             throw new org.springframework.web.server.ResponseStatusException(
                 org.springframework.http.HttpStatus.BAD_REQUEST,
                 "Algunas tareas no pertenecen a la lista o faltan tareas"
@@ -166,8 +165,12 @@ public class TaskService implements TaskUseCase {
             task.setPosition(i);
             repo.save(task);
         }
-        // Recuperar y devolver ordenadas
-        List<Task> updated = new ArrayList<>(repo.findByTodoListId(todoListId));
+        // Recuperar y devolver ordenadas solo las tareas reordenadas
+        List<Task> updated = new ArrayList<>();
+        for (String id : taskIds) {
+            Task task = tasks.stream().filter(t -> t.getId().toString().equals(id)).findFirst().get();
+            updated.add(task);
+        }
         updated.sort(Comparator.comparingInt(Task::getPosition));
         return updated.stream().map(mapper::toResponseDTO).collect(Collectors.toList());
     }
