@@ -12,8 +12,10 @@ import java.util.List;
 public interface TaskMapper {
     @Mapping(target = "todoListId", source = "todoList.id")
     @Mapping(target = "projectId", source = "todoList.project.id")
+    @Mapping(target = "position", source = "position")
     Task entityToDomain(TaskEntity taskEntity);
 
+    @Mapping(target = "position", source = "position")
     TaskEntity domainToEntity(Task task);
     TaskResponseDTO toResponseDTO(Task task);
     List<Task> entitiesToDomains(List<TaskEntity> taskEntities);

@@ -8,4 +8,5 @@ import java.util.UUID;
 
 public interface TaskJpaRepository extends JpaRepository<TaskEntity, UUID> {
     List<TaskEntity> findByTodoListId(UUID todoListId);
+    List<TaskEntity> findByTodoListIdOrderByPositionAsc(UUID todoListId);
 }

@@ -11,4 +11,5 @@ public interface TaskUseCase {
     TaskResponseDTO update(UUID id, TaskUpdateDTO dto, UUID todoListId, UUID projectId);
     TaskResponseDTO updateStatus(UUID id, TaskStatusUpdateDTO dto, UUID todoListId, UUID projectId);
     void delete(UUID id, UUID todoListId, UUID projectId);
+    List<TaskResponseDTO> reorderTasks(UUID projectId, UUID todoListId, List<String> taskIds);
 }

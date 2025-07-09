@@ -9,5 +9,6 @@ public record TaskResponseDTO(
         boolean completed,
         LocalDate dueDate,
         UUID todoListId,
-        UUID projectId
+        UUID projectId,
+        int position
 ) {}
