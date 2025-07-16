@@ -31,7 +31,6 @@ public class AuthService implements LoginUseCase, UserContextUseCase {
     @Override
     @Transactional(readOnly = true)
     public AuthResponseDTO login(LoginRequestDTO dto) {
-
         try{
             User user = credentials.findByEmail(dto.email());
             if(!encoder.matches(dto.password(), user.getPassword())) {
@@ -42,7 +41,6 @@ public class AuthService implements LoginUseCase, UserContextUseCase {
         }catch(NoSuchElementException e){
             throw new BadCredentialsException("Email o contraseña incorrectos");
         }
-
     }
 
     @Override

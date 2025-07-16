@@ -50,7 +50,7 @@ class UserControllerTest {
                 "username": "testuser",
                 "name": "Test User",
                 "email": "test@email.com",
-                "password": "123456"
+                "password": "123456A!"
             }
         """;
 
