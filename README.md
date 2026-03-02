@@ -1,152 +1,100 @@
-# Todo Angular Testing
+# Todo Spring Boot API & Testing
 
-This project is a comprehensive Task Management (Todo) application developed with Angular 19. It includes a complete authentication system, project management, task lists, and individual task handling. The project is specifically designed to demonstrate best practices in end-to-end (E2E) testing with Cypress and unit testing with Jasmine/Karma.
+This project is the backend service for the comprehensive Task Management (Todo) application, built with Spring Boot. It provides a secure, robust REST API designed to demonstrate best practices in backend architecture, security, and extensive automated testing.
 
 ## Key Features
 
-- **Complete Authentication**: User registration and secure login flows.
-- **Project Management**: Create, edit, and delete projects.
-- **Task Lists**: Organize tasks into lists within specific projects.
-- **Task Management**: Full CRUD operations with drag-and-drop support, validations, and status tracking.
-- **Comprehensive Testing**: Full suite of E2E tests with Cypress and unit tests ensuring application stability.
-- **Clean Architecture**: Strict implementation of Clean Architecture principles with clear separation of Data, Domain, and Presentation layers.
+- **Robust REST API**: Full CRUD operations for Users, Projects, Task Lists, and Tasks.
+- **Secure Authentication**: Implementation of Spring Security with JSON Web Tokens (JWT) for stateless authentication and endpoint protection.
+- **Data Persistence**: Integration with PostgreSQL using Spring Data JPA.
+- **DTO Mapping**: Automated object mapping using MapStruct for clear separation between internal entities and external API contracts.
+- **Input Validation**: Request payload validation using Hibernate Validator and Jakarta Validation API.
+- **Extensive Testing Suite**: A strong emphasis on automated testing, including unit and integration tests using JUnit 5, Mockito, AssertJ, and Spring Boot Test.
+- **Test Coverage**: Integrated JaCoCo plugin to enforce and report code coverage metrics.
 
 ## Tech Stack
 
-- **Framework**: Angular 19
-- **Styling**: Tailwind CSS
-- **E2E Testing**: Cypress
-- **Unit Testing**: Jasmine & Karma
-- **Backend Integration**: Designed to consume a Spring Boot REST API
-- **API Testing**: Postman Collection included for backend validation
+- **Framework**: Java 17, Spring Boot 3.4
+- **Database**: PostgreSQL (Production/Dev), H2 Database (In-memory for testing)
+- **Security**: Spring Security, JWT (io.jsonwebtoken)
+- **Data Access**: Spring Data JPA, Hibernate
+- **Utilities**: MapStruct (DTO mapping)
+- **Testing**: JUnit 5, Mockito, AssertJ, Spring Security Test, JaCoCo
+
+## Architecture
+
+The project follows a standard layered architecture, ensuring separation of concerns:
+- **Controllers (Presentation Layer)**: Handle incoming HTTP requests, validate input, and return HTTP responses.
+- **Services (Business Layer)**: Contain the core business logic and transaction management.
+- **Repositories (Data Access Layer)**: Interface with the database using Spring Data JPA.
+- **Security Layer**: Custom filters and configuration for intercepting requests and validating JWTs.
 
 ## Prerequisites
 
-### Required Test User
-
-IMPORTANT: For the Cypress E2E tests to run correctly against the real backend, the following user must be registered in the database:
-
-- **Email:** test@test.com
-- **Password:** Test1@Test!
-
-This user is utilized by all automated tests. If it does not exist in the database, the authentication and workflow tests will fail.
-
-### Backend Configuration
-
-Ensure that the Spring Boot backend is running locally at:
-- **URL:** http://localhost:8080/api
-- **Port:** 8080
+Before running the application, ensure you have the following installed:
+- Java 17 Development Kit (JDK)
+- Maven 3.8+
+- PostgreSQL database server
 
 ## Installation and Setup
 
-### 1. Install dependencies
+### 1. Clone the repository
 ```bash
-npm install
+git clone https://github.com/ecuellarfernandez/todo-springboot-testing.git
+cd todo-springboot-testing
 ```
 
-### 2. Configure the backend
-Start your Spring Boot backend on port 8080 to enable full end-to-end integration.
+### 2. Configure the Database
+Create a PostgreSQL database for the application. You will need to set your database credentials in the `src/main/resources/application.properties` (or `application.yml`) file:
 
-### 3. Create the test user
-Register the test user in your database using the following JSON payload:
-```json
-{
-  "username": "testuser",
-  "name": "Test User",
-  "email": "test@test.com",
-  "password": "Test1@Test!"
-}
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/your_db_name
+spring.datasource.username=postgres
+spring.datasource.password=your_password
 ```
+
+### 3. JWT Configuration
+Ensure you have configured a secure JWT secret key in your application properties:
+
+```properties
+jwt.secret=your_super_secret_key_for_jwt_generation_must_be_long
+jwt.expiration=86400000
+```
+
+### 4. Build and Run
+You can compile and start the application using the Maven wrapper:
+
+```bash
+# Build the project (compiles MapStruct mappers and runs tests)
+mvn clean install
+
+# Run the Spring Boot application
+mvn spring-boot:run
+```
+The API will be available at `http://localhost:8080/api`.
 
 ## Testing Strategy
 
-### E2E Testing with Cypress
-
-The project includes a comprehensive E2E test suite covering all user workflows without using mocks. The tests interact directly with the real backend and automatically clean up generated data.
-
-#### Test Structure
-```text
-cypress/e2e/
-├── auth/                    # Authentication workflows
-├── projects/                # Project management workflows
-├── todolists/               # Task list management
-├── tasks/                   # Task CRUD and advanced interactions
-└── integration/             # Complete end-to-end user journeys
-```
-
-#### Running E2E Tests
-```bash
-# Run tests headlessly
-npm run cy:run
-
-# Open Cypress interactive UI
-npm run cy:open
-```
+This repository is designed with a "testing-first" mindset. It separates testing concerns using appropriate tools for each layer.
 
 ### Unit Testing
+- **Mockito** is used to mock dependencies (like repositories) to test service logic in isolation.
+- **AssertJ** provides fluent assertions for clear and readable test validations.
 
-Unit tests are implemented using Jasmine and Karma to ensure component and service reliability.
+### Integration Testing
+- Uses **H2 Database** an in-memory database to test JPA queries and repository methods without affecting the main PostgreSQL database.
+- **@SpringBootTest** and **MockMvc** are utilized to test the entire request lifecycle, including security filters, validation, and JSON serialization.
+- **Spring Security Test** (@WithMockUser) is used to simulate authenticated users during endpoint testing.
+
+### Code Coverage
+The project uses JaCoCo to track test coverage. You can generate a coverage report by running:
 
 ```bash
-# Run unit tests
-npm run test
-
-# Run tests with coverage report
-npm run coverage
+mvn test
 ```
+The HTML report will be generated in `target/site/jacoco/index.html`.
 
-## API and Postman Collection
+## Development Notes
 
-A complete Postman collection is included to test the Spring Boot API endpoints.
-
-### Location
-The collection file is located at: `src/todo-collection-v4.json`
-
-### Key Endpoints Covered
-- **Authentication**: Login, Registration, Current User
-- **Projects**: Full CRUD operations
-- **Task Lists**: Nested CRUD operations by project
-- **Tasks**: Creation, updates, status toggling, and reordering
-
-The collection includes automated tests for HTTP status codes, response times, data validation, and automated token injection for authorized requests via collection variables (`col_baseUrl` and `col_authToken`).
-
-## Project Architecture
-
-The frontend application strictly follows Clean Architecture and Domain-Driven Design principles.
-
-### Directory Structure
-```text
-src/app/
-├── auth/                    # Authentication feature module
-│   ├── data/                # Repository implementations and API services
-│   ├── domain/              # Models, Entities, and Use Cases
-│   └── presentation/        # UI Components and state management
-├── core/                    # Shared core functionality
-│   ├── components/          # Reusable UI components
-│   ├── guards/              # Route protection and authorization
-│   ├── interceptors/        # HTTP interceptors (e.g., JWT injection)
-│   └── services/            # Global singleton services
-├── projects/                # Projects feature module
-├── tasks/                   # Tasks feature module
-└── todolists/               # Task Lists feature module
-```
-
-### Implemented Patterns
-- **Clean Architecture**: Clear separation of concerns isolating business logic from UI frameworks.
-- **Repository Pattern**: Abstraction of HTTP data access.
-- **Use Case Pattern**: Encapsulation of specific business operations.
-- **Dependency Injection**: Utilizing Angular's DI for testability and loose coupling.
-- **Observer Pattern**: Heavy usage of RxJS for reactive programming and state communication.
-
-## Development
-
-Run the development server:
-```bash
-npm start
-```
-Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
-
-To build the project for production:
-```bash
-npm run build
-```
+- **MapStruct**: If you modify DTOs or Entities, you must run `mvn clean compile` to regenerate the mapper implementations.
+- **Flyway/Liquibase**: (If applicable) Database schema changes should be managed through migration scripts.
